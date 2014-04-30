@@ -1,0 +1,27 @@
+{
+  "name": "purescript-string-parsers",
+  "description": "A free applicative for describing parsers which work on strings",
+  "keywords": ["purescript"],
+  "ignore": [
+    "**/.*",
+    "bower_components",
+    "node_modules",
+    "output",
+    "tests",
+    "js",
+    "tmp",
+    "bower.json",
+    "Gruntfile.js",
+    "package.json"
+  ],
+  "dependencies": {
+    "purescript-arrays"               : "*",
+    "purescript-maybe"                : "*",
+    "purescript-strings"              : "*",
+    "purescript-foldable-traversable" : "*"
+  },
+  "devDependencies": {
+    "purescript-math"                 : "*",
+    "purescript-quickcheck"           : "*"
+  }
+}
