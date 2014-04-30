@@ -1,6 +1,6 @@
 {
   "name": "purescript-string-parsers",
-  "description": "A free applicative for describing parsers which work on strings",
+  "description": "A parsing library for parsing strings", 
   "keywords": ["purescript"],
   "ignore": [
     "**/.*",
