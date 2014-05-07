@@ -50,6 +50,10 @@ exprTest = buildExprParser [[Infix (string "/" >>= \_ -> return (/)) AssocRight]
                            ,[Infix (string "*" >>= \_ -> return (*)) AssocRight]
                            ,[Infix (string "-" >>= \_ -> return (-)) AssocRight]
                            ,[Infix (string "+" >>= \_ -> return (+)) AssocRight]] digit
+                           
+tryTest :: Parser String
+tryTest = try ((++) <$> string "aa" <*> string "bb") <|>
+          (++) <$> string "aa" <*> string "cc"
 
 main = do
   parseTest nested "(((a)))"
@@ -64,3 +68,4 @@ main = do
     return as) "a,a,a,"  
   parseTest opTest "a+b+c"
   parseTest exprTest "1*2+3/4-5"
+  parseTest tryTest "aacc"

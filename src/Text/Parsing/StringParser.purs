@@ -2,6 +2,8 @@ module Text.Parsing.StringParser where
   
 import Data.Either (Either(..))
 
+type Pos = Number
+
 -- 
 -- Strings are represented as a string with an index from the
 -- start of the string. 
@@ -12,7 +14,7 @@ import Data.Either (Either(..))
 -- This allows us to avoid repeatedly finding substrings
 -- every time we match a character.
 --
-type PosString = { str :: String, pos :: Number }
+type PosString = { str :: String, pos :: Pos }
 
 --
 -- The type of parsing errors
@@ -26,13 +28,13 @@ instance showParseError :: Show ParseError where
 -- A parser is represented as a function which takes a pair of 
 -- continuations for failure and success.
 --
-data Parser a = Parser (forall r. PosString -> (ParseError -> r) -> (a -> PosString -> r) -> r)
+data Parser a = Parser (forall r. PosString -> (Pos -> ParseError -> r) -> (a -> PosString -> r) -> r)
 
-unParser :: forall a r. Parser a -> PosString -> (ParseError -> r) -> (a -> PosString -> r) -> r
+unParser :: forall a r. Parser a -> PosString -> (Pos -> ParseError -> r) -> (a -> PosString -> r) -> r
 unParser (Parser p) = p
 
 runParser :: forall a. Parser a -> String -> Either ParseError a
-runParser p s = unParser p { str: s, pos: 0 } Left (\a _ -> Right a)
+runParser p s = unParser p { str: s, pos: 0 } (\_ err -> Left err) (\a _ -> Right a)
 
 --
 -- Parser type class instances
@@ -58,10 +60,16 @@ instance bindParser :: Bind Parser where
 instance monadParser :: Monad Parser
 
 instance alternativeParser :: Alternative Parser where
-  empty = Parser (\_ fc _ -> fc (ParseError "No alternative"))
+  empty = fail "No alternative"
   (<|>) p1 p2 = Parser (\s fc sc -> 
-    unParser p1 s (\_ ->
-      unParser p2 s fc sc) sc)
+    unParser p1 s (\pos msg -> 
+      if s.pos == pos 
+      then unParser p2 s fc sc 
+      else fc pos msg) 
+      sc)
 
 fail :: forall a. String -> Parser a
-fail msg = Parser (\_ fc _ -> fc (ParseError msg))
+fail msg = Parser (\{ pos = pos } fc _ -> fc pos (ParseError msg))
+
+try :: forall a. Parser a -> Parser a
+try p = Parser (\(s@{ pos = pos }) fc sc -> unParser p s (\_ -> fc pos) sc)
