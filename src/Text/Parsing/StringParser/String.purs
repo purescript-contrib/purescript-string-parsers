@@ -1,12 +1,12 @@
 module Text.Parsing.StringParser.String where
-  
+
 import Data.String (charAt, length, take, indexOf')
 import Text.Parsing.StringParser
 
-eof :: Parser {}
+eof :: Parser Unit
 eof = Parser (\s fc sc -> case s of
-  { str = str, pos = i } | i < length str -> fc i (ParseError "Expected EOF") 
-  _ -> sc {} s)
+  { str = str, pos = i } | i < length str -> fc i (ParseError "Expected EOF")
+  _ -> sc unit s)
 
 anyChar :: Parser String
 anyChar = Parser (\s fc sc -> case s of
