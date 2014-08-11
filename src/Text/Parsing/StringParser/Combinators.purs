@@ -1,6 +1,9 @@
 module Text.Parsing.StringParser.Combinators where
 
 import Data.Maybe (Maybe(..))
+
+import Control.Alt
+
 import Text.Parsing.StringParser
 
 many :: forall a. Parser a -> Parser [a]
@@ -22,14 +25,14 @@ between :: forall a open close. Parser open -> Parser close -> Parser a -> Parse
 between open close p = do
   open
   a <- p
-  close 
+  close
   return a
 
 option :: forall a. a -> Parser a -> Parser a
 option a p = p <|> return a
 
-optional :: forall a. Parser a -> Parser {}
-optional p = (p >>= \_ -> return {}) <|> return {}
+optional :: forall a. Parser a -> Parser Unit
+optional p = (p >>= \_ -> return unit) <|> return unit
 
 optionMaybe :: forall a. Parser a -> Parser (Maybe a)
 optionMaybe p = option Nothing (Just <$> p)
@@ -56,7 +59,7 @@ sepEndBy1 p sep = do
       return (a : as)) <|> return [a]
 
 endBy1 :: forall a sep. Parser a -> Parser sep -> Parser [a]
-endBy1 p sep = many1 $ do 
+endBy1 p sep = many1 $ do
   a <- p
   sep
   return a

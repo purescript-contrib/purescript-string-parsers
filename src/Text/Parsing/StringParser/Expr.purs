@@ -3,6 +3,8 @@ module Text.Parsing.StringParser.Expr where
 import Data.Either
 import Data.Foldable
 
+import Control.Alt
+
 import Text.Parsing.StringParser
 import Text.Parsing.StringParser.Combinators
 
@@ -22,19 +24,19 @@ type SplitAccum a = { rassoc :: [Parser (a -> a -> a)]
 
 buildExprParser :: forall a. OperatorTable a -> Parser a -> Parser a
 buildExprParser operators simpleExpr =
-  let 
+  let
     makeParser term ops =
-      let 
-        accum     = foldr splitOp { rassoc: [], lassoc: [], nassoc: [], prefix: [], postfix: [] } ops 
+      let
+        accum     = foldr splitOp { rassoc: [], lassoc: [], nassoc: [], prefix: [], postfix: [] } ops
 
-        rassocOp  = choice accum.rassoc 
-        lassocOp  = choice accum.lassoc 
-        nassocOp  = choice accum.nassoc 
-        prefixOp  = choice accum.prefix <?> "" 
-        postfixOp = choice accum.postfix <?> "" 
-         
+        rassocOp  = choice accum.rassoc
+        lassocOp  = choice accum.lassoc
+        nassocOp  = choice accum.nassoc
+        prefixOp  = choice accum.prefix <?> ""
+        postfixOp = choice accum.postfix <?> ""
+
         postfixP = postfixOp <|> return id
-        prefixP = prefixOp <|> return id 
+        prefixP = prefixOp <|> return id
       in do
         x <- termP prefixP term postfixP
         rassocP x rassocOp prefixP term postfixP
@@ -42,7 +44,7 @@ buildExprParser operators simpleExpr =
           <|> nassocP x nassocOp prefixP term postfixP
           <|> return x
           <?> "operator"
-          
+
     splitOp :: forall a. Operator a -> SplitAccum a -> SplitAccum a
     splitOp (Infix op AssocNone)  accum = accum { nassoc  = op: accum.nassoc }
     splitOp (Infix op AssocLeft)  accum = accum { lassoc  = op: accum.lassoc }

@@ -15,13 +15,14 @@
     "package.json"
   ],
   "dependencies": {
-    "purescript-arrays"               : "*",
-    "purescript-maybe"                : "*",
-    "purescript-strings"              : "*",
+    "purescript-control": "~0.2.0",
+    "purescript-arrays": "~0.2.0",
+    "purescript-maybe": "~0.2.0",
+    "purescript-strings": "*",
     "purescript-foldable-traversable" : "*"
   },
   "devDependencies": {
-    "purescript-math"                 : "*",
-    "purescript-quickcheck"           : "*"
+    "purescript-math": "*",
+    "purescript-quickcheck": "*"
   }
 }
