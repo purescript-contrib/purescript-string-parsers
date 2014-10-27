@@ -1,7 +1,9 @@
 {
   "name": "purescript-string-parsers",
-  "description": "A parsing library for parsing strings", 
-  "keywords": ["purescript"],
+  "description": "A parsing library for parsing strings",
+  "keywords": [
+    "purescript"
+  ],
   "ignore": [
     "**/.*",
     "bower_components",
@@ -18,11 +20,11 @@
     "purescript-control": "~0.2.0",
     "purescript-arrays": "~0.2.0",
     "purescript-maybe": "~0.2.0",
-    "purescript-strings": "*",
-    "purescript-foldable-traversable" : "*"
+    "purescript-strings": "~0.3.3",
+    "purescript-foldable-traversable": "~0.1.4"
   },
   "devDependencies": {
-    "purescript-math": "*",
-    "purescript-quickcheck": "*"
+    "purescript-math": "~0.1.0",
+    "purescript-quickcheck": "~0.2.2"
   }
 }
