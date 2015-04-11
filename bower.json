@@ -21,7 +21,8 @@
     "purescript-arrays": "~0.3.0",
     "purescript-maybe": "~0.2.0",
     "purescript-strings": "~0.4.2",
-    "purescript-foldable-traversable": "~0.3.0"
+    "purescript-foldable-traversable": "~0.3.0",
+    "purescript-integers": "~0.1.0"
   },
   "devDependencies": {
     "purescript-math": "~0.1.0",

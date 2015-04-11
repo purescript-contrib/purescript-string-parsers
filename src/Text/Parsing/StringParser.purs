@@ -6,8 +6,9 @@ import Control.Alt
 import Control.Alternative
 import Control.MonadPlus
 import Control.Plus
+import Data.Int (Int())
 
-type Pos = Number
+type Pos = Int
 
 --
 -- Strings are represented as a string with an index from the
@@ -24,7 +25,7 @@ type PosString = { str :: String, pos :: Pos }
 --
 -- The type of parsing errors
 --
-data ParseError = ParseError String
+newtype ParseError = ParseError String
 
 instance showParseError :: Show ParseError where
   show (ParseError msg) = msg
@@ -33,13 +34,13 @@ instance showParseError :: Show ParseError where
 -- A parser is represented as a function which takes a pair of
 -- continuations for failure and success.
 --
-data Parser a = Parser (forall r. PosString -> (Pos -> ParseError -> r) -> (a -> PosString -> r) -> r)
+newtype Parser a = Parser (forall r. PosString -> (Pos -> ParseError -> r) -> (a -> PosString -> r) -> r)
 
 unParser :: forall a r. Parser a -> PosString -> (Pos -> ParseError -> r) -> (a -> PosString -> r) -> r
 unParser (Parser p) = p
 
 runParser :: forall a. Parser a -> String -> Either ParseError a
-runParser p s = unParser p { str: s, pos: 0 } (\_ err -> Left err) (\a _ -> Right a)
+runParser p s = unParser p { str: s, pos: zero } (\_ err -> Left err) (\a _ -> Right a)
 
 --
 -- Parser type class instances

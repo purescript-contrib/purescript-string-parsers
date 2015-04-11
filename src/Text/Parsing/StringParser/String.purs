@@ -12,10 +12,10 @@ eof = Parser (\s fc sc -> case s of
 anyChar :: Parser String
 anyChar = Parser (\s fc sc -> case s of
   { str = str, pos = i } -> case charAt i str of
-    Just chr -> sc (fromChar chr) { str: str, pos: i + 1 }
+    Just chr -> sc (fromChar chr) { str: str, pos: i + one }
     Nothing -> fc i (ParseError "Unexpected EOF"))
 
 string :: String -> Parser String
 string nt = Parser (\s fc sc -> case s of
-  { str = str, pos = i } | indexOf' nt i str == i -> sc nt { str: str, pos: i + length nt }
+  { str = str, pos = i } | indexOf' nt i str == (Just i) -> sc nt { str: str, pos: i + length nt }
   { pos = i } -> fc i (ParseError $ "Expected '" ++ nt ++ "'."))
