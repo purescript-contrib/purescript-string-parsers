@@ -29,9 +29,9 @@ anyDigit = Parser \{ str: str, pos: i } fc sc -> case charAt i str of
        then sc chrS { str: str, pos: i + 1 }
        else fc i (ParseError "Expected digit")
   Nothing -> fc i (ParseError "Unexpected EOF")
-
-rxDigit :: Rx.Regex
-rxDigit = Rx.regex "^[0-9]" Rx.noFlags
+  where
+  rxDigit :: Rx.Regex
+  rxDigit = Rx.regex "^[0-9]" Rx.noFlags
 
 string :: String -> Parser String
 string nt = Parser (\s fc sc -> case s of
