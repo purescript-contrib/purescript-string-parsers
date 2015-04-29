@@ -1,10 +1,12 @@
 module Text.Parsing.StringParser.Combinators where
 
+import Control.Alt ((<|>))
+import Control.Apply ((*>))
 import Data.Maybe (Maybe(..))
-
-import Control.Alt
-
 import Text.Parsing.StringParser
+
+lookAhead :: forall a. Parser a -> Parser a
+lookAhead p = Parser \ps fc sc -> unParser p ps fc (\s _ -> sc s ps)
 
 many :: forall a. Parser a -> Parser [a]
 many p = many1 p <|> return []
@@ -100,3 +102,10 @@ choice :: forall a. [Parser a] -> Parser a
 choice []   = fail "Nothing to parse"
 choice [x]  = x
 choice (x:xs) = x <|> choice xs
+
+manyTill :: forall a end. Parser a -> Parser end -> Parser [a]
+manyTill p end = scan
+  where
+  scan = (end *> return []) <|> do x <- p
+                                   xs <- scan
+                                   return (x:xs)
