@@ -1,33 +1,47 @@
-module Text.Parsing.StringParser.Expr where
+-- | This module defines helper functions for defining parsers using operator tables.
+
+module Text.Parsing.StringParser.Expr 
+  ( Assoc(..)
+  , Operator(..)
+  , OperatorTable()
+  , buildExprParser
+  ) where
+
+import Prelude
 
 import Data.Either
 import Data.Foldable
+import Data.List (List(..))
 
 import Control.Alt
 
 import Text.Parsing.StringParser
 import Text.Parsing.StringParser.Combinators
 
+-- | Operator associativity types.
 data Assoc = AssocNone | AssocLeft | AssocRight
 
+-- | Operator types: infix, prefix, postfix.
 data Operator a = Infix   (Parser (a -> a -> a)) Assoc
                 | Prefix  (Parser (a -> a))
                 | Postfix (Parser (a -> a))
 
-type OperatorTable a = [[Operator a]]
+-- | An operator table arranges operators into precedence groups.
+type OperatorTable a = Array (Array (Operator a))
 
-type SplitAccum a = { rassoc :: [Parser (a -> a -> a)]
-                    , lassoc :: [Parser (a -> a -> a)]
-                    , nassoc :: [Parser (a -> a -> a)]
-                    , prefix :: [Parser (a -> a)]
-                    , postfix :: [Parser (a -> a)] }
+type SplitAccum a = { rassoc  :: List (Parser (a -> a -> a))
+                    , lassoc  :: List (Parser (a -> a -> a))
+                    , nassoc  :: List (Parser (a -> a -> a))
+                    , prefix  :: List (Parser (a -> a))
+                    , postfix :: List (Parser (a -> a))
+                    }
 
 buildExprParser :: forall a. OperatorTable a -> Parser a -> Parser a
 buildExprParser operators simpleExpr =
   let
     makeParser term ops =
       let
-        accum     = foldr splitOp { rassoc: [], lassoc: [], nassoc: [], prefix: [], postfix: [] } ops
+        accum     = foldr splitOp { rassoc: Nil, lassoc: Nil, nassoc: Nil, prefix: Nil, postfix: Nil } ops
 
         rassocOp  = choice accum.rassoc
         lassocOp  = choice accum.lassoc
@@ -36,7 +50,7 @@ buildExprParser operators simpleExpr =
         postfixOp = choice accum.postfix <?> ""
 
         postfixP = postfixOp <|> return id
-        prefixP = prefixOp <|> return id
+        prefixP  = prefixOp <|> return id
       in do
         x <- termP prefixP term postfixP
         rassocP x rassocOp prefixP term postfixP
@@ -46,11 +60,11 @@ buildExprParser operators simpleExpr =
           <?> "operator"
 
     splitOp :: forall a. Operator a -> SplitAccum a -> SplitAccum a
-    splitOp (Infix op AssocNone)  accum = accum { nassoc  = op: accum.nassoc }
-    splitOp (Infix op AssocLeft)  accum = accum { lassoc  = op: accum.lassoc }
-    splitOp (Infix op AssocRight) accum = accum { rassoc  = op: accum.rassoc }
-    splitOp (Prefix  op)          accum = accum { prefix  = op: accum.prefix }
-    splitOp (Postfix op)          accum = accum { postfix = op: accum.postfix }
+    splitOp (Infix op AssocNone)  accum = accum { nassoc  = Cons op accum.nassoc }
+    splitOp (Infix op AssocLeft)  accum = accum { lassoc  = Cons op accum.lassoc }
+    splitOp (Infix op AssocRight) accum = accum { rassoc  = Cons op accum.rassoc }
+    splitOp (Prefix  op)          accum = accum { prefix  = Cons op accum.prefix }
+    splitOp (Postfix op)          accum = accum { postfix = Cons op accum.postfix }
 
     rassocP :: forall a b c. a -> Parser (a -> a -> a) -> Parser (b -> c) -> Parser b -> Parser (c -> a) -> Parser a
     rassocP x rassocOp prefixP term postfixP = do

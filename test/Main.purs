@@ -1,13 +1,15 @@
-module Main where
+module Test.Main where
+            
+import Prelude
 
-import Data.Array
 import Data.Maybe
 import Data.Either
-
-import Debug.Trace
+import Data.Functor (($>))
+import Data.String (fromChar)
 
 import Control.Alt
 import Control.Monad.Eff
+import Control.Monad.Eff.Console
 
 import Text.Parsing.StringParser
 import Text.Parsing.StringParser.Combinators
@@ -19,22 +21,20 @@ import qualified Test.QuickCheck as QC
 parens :: forall a. Parser a -> Parser a
 parens = between (string "(") (string ")")
 
-nested :: Parser Number
+nested :: Parser Int
 nested = fix $ \p -> (do
   string "a"
   return 0) <|> ((+) 1) <$> parens p
 
-parseTest :: forall a eff. (Show a) => Parser a -> String -> Eff (trace :: Trace | eff) Unit
+parseTest :: forall a eff. (Show a) => Parser a -> String -> Eff (console :: CONSOLE | eff) Unit
 parseTest p input = case runParser p input of
   Left (ParseError err) -> print err
   Right result -> print result
 
 opTest :: Parser String
-opTest = chainl anyChar (do
-  string "+"
-  return (++)) ""
+opTest = chainl (fromChar <$> anyChar) (string "+" $> append) ""
 
-digit :: Parser Number
+digit :: Parser Int
 digit = (string "0" >>= \_ -> return 0)
         <|> (string "1" >>= \_ -> return 1)
         <|> (string "2" >>= \_ -> return 2)
@@ -46,11 +46,12 @@ digit = (string "0" >>= \_ -> return 0)
         <|> (string "8" >>= \_ -> return 8)
         <|> (string "9" >>= \_ -> return 9)
 
-exprTest :: Parser Number
-exprTest = buildExprParser [[Infix (string "/" >>= \_ -> return (/)) AssocRight]
-                           ,[Infix (string "*" >>= \_ -> return (*)) AssocRight]
-                           ,[Infix (string "-" >>= \_ -> return (-)) AssocRight]
-                           ,[Infix (string "+" >>= \_ -> return (+)) AssocRight]] digit
+exprTest :: Parser Int
+exprTest = buildExprParser [ [Infix (string "/" >>= \_ -> return div) AssocRight]
+                           , [Infix (string "*" >>= \_ -> return mul) AssocRight]
+                           , [Infix (string "-" >>= \_ -> return sub) AssocRight]
+                           , [Infix (string "+" >>= \_ -> return add) AssocRight]
+                           ] digit
 
 tryTest :: Parser String
 tryTest = try ((++) <$> string "aa" <*> string "bb") <|>
