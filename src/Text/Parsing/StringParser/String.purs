@@ -48,7 +48,7 @@ noneOf ss = Parser \{ str: str, pos: i } fc sc -> case charAt i str of
   Just chr ->
     if chr `notElem` ss
        then sc chr { str: str, pos: i + 1 }
-       else fc i (ParseError "Expected none of " <> show ss)
+       else fc i (ParseError $ "Expected none of " <> show ss)
   Nothing -> fc i (ParseError "Unexpected EOF")
 
 -- | Match the specified string.
