@@ -4,6 +4,7 @@ module Text.Parsing.StringParser.String
   ( eof
   , anyChar
   , anyDigit
+  , noneOf
   , string
   ) where
 
