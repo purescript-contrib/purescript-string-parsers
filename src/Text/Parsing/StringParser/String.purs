@@ -46,8 +46,7 @@ anyDigit = Parser \{ str: str, pos: i } fc sc -> case charAt i str of
 noneOf :: Array Char -> Parser Char
 noneOf ss = Parser \{ str: str, pos: i } fc sc -> case charAt i str of
   Just chr ->
-    let chrS = fromChar chr
-    in if chrS `notElem` ss
+    if chr `notElem` ss
        then sc chr { str: str, pos: i + 1 }
        else fc i (ParseError "Expected none of " <> show ss)
   Nothing -> fc i (ParseError "Unexpected EOF")
