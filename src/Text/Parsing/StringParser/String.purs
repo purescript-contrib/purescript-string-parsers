@@ -9,6 +9,7 @@ module Text.Parsing.StringParser.String
 
 import Prelude
 
+import Data.Foldable (notElem)
 import Data.Maybe (Maybe(..))
 import Data.String (charAt, fromChar, length, indexOf')
 import Text.Parsing.StringParser
@@ -40,6 +41,13 @@ anyDigit = Parser \{ str: str, pos: i } fc sc -> case charAt i str of
   where
   rxDigit :: Rx.Regex
   rxDigit = Rx.regex "^[0-9]" Rx.noFlags
+
+noneOf :: Array Char -> Parser Char
+noneOf ss = do
+  c <- anyChar
+  if c `notElem` ss
+    then pure c
+    else fail $ "Expected none of " <> show ss
 
 -- | Match the specified string.
 string :: String -> Parser String
