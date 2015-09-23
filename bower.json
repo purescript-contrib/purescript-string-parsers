@@ -20,11 +20,11 @@
     "purescript-control": "^0.3.0",
     "purescript-arrays": "^0.4.0",
     "purescript-maybe": "^0.3.0",
-    "purescript-strings": "^0.5.0",
+    "purescript-strings": "~0.7.0",
     "purescript-foldable-traversable": "^0.4.0"
   },
   "devDependencies": {
     "purescript-math": "^0.2.0",
-    "purescript-quickcheck": "^0.6.0"
+    "purescript-quickcheck": "^0.12.0"
   }
 }
