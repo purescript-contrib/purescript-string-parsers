@@ -1,5 +1,5 @@
 module Test.Main where
-            
+
 import Prelude
 
 import Data.Maybe
@@ -17,6 +17,7 @@ import Text.Parsing.StringParser.String
 import Text.Parsing.StringParser.Expr
 
 import qualified Test.QuickCheck as QC
+import qualified Test.QuickCheck.LCG as QC
 
 parens :: forall a. Parser a -> Parser a
 parens = between (string "(") (string ")")
