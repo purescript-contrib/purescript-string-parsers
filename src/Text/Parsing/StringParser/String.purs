@@ -5,12 +5,22 @@ module Text.Parsing.StringParser.String
   , anyChar
   , anyDigit
   , string
+  , satisfy
+  , char
+  , whiteSpace
+  , skipSpaces
+  , oneOf
+  , noneOf
   ) where
 
 import Prelude
 
 import Data.Maybe (Maybe(..))
-import Data.String (charAt, fromChar, length, indexOf')
+import Data.String (charAt, fromChar, length, indexOf', fromCharArray)
+import Data.Char (toString)
+import Data.Foldable (Foldable, foldMap, elem, notElem)
+
+import Text.Parsing.StringParser.Combinators (many)
 import Text.Parsing.StringParser
 
 import qualified Data.String.Regex as Rx
@@ -46,3 +56,35 @@ string :: String -> Parser String
 string nt = Parser (\s fc sc -> case s of
   { str = str, pos = i } | indexOf' nt i str == Just i -> sc nt { str: str, pos: i + length nt }
   { pos = i } -> fc i (ParseError $ "Expected '" ++ nt ++ "'."))
+
+-- | Match a character satisfying the given predicate.
+satisfy :: (Char -> Boolean) -> Parser Char
+satisfy f = try do
+  c <- anyChar
+  if f c
+     then return c
+     else fail "Character did not satisfy predicate"
+
+-- | Match the specified character.
+char :: Char -> Parser Char
+char c = satisfy (== c)
+
+-- | Match many whitespace characters.
+whiteSpace :: Parser String
+whiteSpace = do
+  cs <- many $ satisfy \ c -> c == 'n' || c == 'r' || c == ' ' || c == '\t'
+  return $ foldMap toString cs
+
+-- | Skip many whitespace characters.
+skipSpaces :: Parser Unit
+skipSpaces = do
+  whiteSpace
+  return unit
+
+-- | Match one of the characters in the foldable structure.
+oneOf :: forall f. (Foldable f) => f Char -> Parser Char
+oneOf = satisfy <<< flip elem
+
+-- | Match any character not in the foldable structure.
+noneOf :: forall f. (Foldable f) => f Char -> Parser Char
+noneOf = satisfy <<< flip notElem
