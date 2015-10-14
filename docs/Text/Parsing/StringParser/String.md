@@ -34,4 +34,52 @@ string :: String -> Parser String
 
 Match the specified string.
 
+#### `satisfy`
+
+``` purescript
+satisfy :: (Char -> Boolean) -> Parser Char
+```
+
+Match a character satisfying the given predicate.
+
+#### `char`
+
+``` purescript
+char :: Char -> Parser Char
+```
+
+Match the specified character.
+
+#### `whiteSpace`
+
+``` purescript
+whiteSpace :: Parser String
+```
+
+Match many whitespace characters.
+
+#### `skipSpaces`
+
+``` purescript
+skipSpaces :: Parser Unit
+```
+
+Skip many whitespace characters.
+
+#### `oneOf`
+
+``` purescript
+oneOf :: forall f. (Foldable f) => f Char -> Parser Char
+```
+
+Match one of the characters in the foldable structure.
+
+#### `noneOf`
+
+``` purescript
+noneOf :: forall f. (Foldable f) => f Char -> Parser Char
+```
+
+Match any character not in the foldable structure.
+
 
