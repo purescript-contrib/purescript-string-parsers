@@ -20,7 +20,7 @@ import Data.String (charAt, fromChar, length, indexOf', fromCharArray)
 import Data.Char (toString)
 import Data.Foldable (Foldable, foldMap, elem, notElem)
 
-import Text.Parsing.StringParser.Combinators (many)
+import Text.Parsing.StringParser.Combinators (many, (<?>))
 import Text.Parsing.StringParser
 
 import qualified Data.String.Regex as Rx
@@ -63,23 +63,21 @@ satisfy f = try do
   c <- anyChar
   if f c
      then return c
-     else fail "Character did not satisfy predicate"
+     else fail $ "Character " <> toString c <> " did not satisfy predicate"
 
 -- | Match the specified character.
 char :: Char -> Parser Char
-char c = satisfy (== c)
+char c = satisfy (== c) <?> "Could not match character " <> toString c
 
 -- | Match many whitespace characters.
 whiteSpace :: Parser String
 whiteSpace = do
-  cs <- many $ satisfy \ c -> c == 'n' || c == 'r' || c == ' ' || c == '\t'
-  return $ foldMap toString cs
+  cs <- many (satisfy \ c -> c == 'n' || c == 'r' || c == ' ' || c == '\t')
+  return (foldMap toString cs)
 
 -- | Skip many whitespace characters.
 skipSpaces :: Parser Unit
-skipSpaces = do
-  whiteSpace
-  return unit
+skipSpaces = void whiteSpace
 
 -- | Match one of the characters in the foldable structure.
 oneOf :: forall f. (Foldable f) => f Char -> Parser Char
