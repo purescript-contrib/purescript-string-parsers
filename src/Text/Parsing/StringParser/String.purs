@@ -72,7 +72,7 @@ char c = satisfy (== c) <?> "Could not match character " <> toString c
 -- | Match many whitespace characters.
 whiteSpace :: Parser String
 whiteSpace = do
-  cs <- many (satisfy \ c -> c == 'n' || c == 'r' || c == ' ' || c == '\t')
+  cs <- many (satisfy \ c -> c == '\n' || c == '\r' || c == ' ' || c == '\t')
   return (foldMap toString cs)
 
 -- | Skip many whitespace characters.
