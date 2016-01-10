@@ -16,7 +16,7 @@
     "Gruntfile.js",
     "package.json"
   ],
-  "repository": {                                              
+  "repository": {
     "type": "git",
     "url": "git://github.com/paf31/purescript-string-parsers.git"
   },
@@ -25,7 +25,9 @@
     "purescript-arrays": "~0.4.2",
     "purescript-maybe": "~0.3.4",
     "purescript-strings": "~0.7.0",
-    "purescript-foldable-traversable": "~0.4.0"
+    "purescript-foldable-traversable": "~0.4.0",
+    "purescript-either": "~0.2.3",
+    "purescript-lists": "~0.7.8"
   },
   "devDependencies": {
     "purescript-math": "~0.2.0",
