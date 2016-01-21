@@ -82,4 +82,36 @@ noneOf :: forall f. (Foldable f) => f Char -> Parser Char
 
 Match any character not in the foldable structure.
 
+#### `lowerCaseChar`
+
+``` purescript
+lowerCaseChar :: Parser Char
+```
+
+Match any lower case character.
+
+#### `upperCaseChar`
+
+``` purescript
+upperCaseChar :: Parser Char
+```
+
+Match any upper case character.
+
+#### `anyLetter`
+
+``` purescript
+anyLetter :: Parser Char
+```
+
+Match any letter.
+
+#### `alphaNum`
+
+``` purescript
+alphaNum :: Parser Char
+```
+
+Match a letter or a number.
+
 

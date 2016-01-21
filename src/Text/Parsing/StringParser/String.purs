@@ -11,14 +11,20 @@ module Text.Parsing.StringParser.String
   , skipSpaces
   , oneOf
   , noneOf
+  , lowerCaseChar
+  , upperCaseChar
+  , anyLetter
+  , alphaNum
   ) where
 
 import Prelude
 
 import Data.Maybe (Maybe(..))
 import Data.String (charAt, fromChar, length, indexOf', fromCharArray)
-import Data.Char (toString)
+import Data.Char (toString, toCharCode)
 import Data.Foldable (Foldable, foldMap, elem, notElem)
+import Data.Array ((..))
+import Control.Alt ((<|>))
 
 import Text.Parsing.StringParser.Combinators (many, (<?>))
 import Text.Parsing.StringParser
@@ -86,3 +92,27 @@ oneOf = satisfy <<< flip elem
 -- | Match any character not in the foldable structure.
 noneOf :: forall f. (Foldable f) => f Char -> Parser Char
 noneOf = satisfy <<< flip notElem
+
+-- | Match any lower case character.
+lowerCaseChar :: Parser Char
+lowerCaseChar = do
+  c <- anyChar
+  if toCharCode c `elem` (97 .. 122)
+     then return c
+     else fail $ "Expected a lower case character but found '" <> toString c <> "'"
+
+-- | Match any upper case character.
+upperCaseChar :: Parser Char
+upperCaseChar = do
+  c <- anyChar
+  if toCharCode c `elem` (65 .. 90)
+     then return c
+     else fail $ "Expected an upper case character but found '" <> toString c <> "'"
+
+-- | Match any letter.
+anyLetter :: Parser Char
+anyLetter = lowerCaseChar <|> upperCaseChar <?> "Expected a letter"
+
+-- | Match a letter or a number.
+alphaNum :: Parser Char
+alphaNum = anyLetter <|> anyDigit <?> "Expected a letter or a number"
