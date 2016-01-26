@@ -58,12 +58,8 @@ instance applicativeParser :: Applicative Parser where
   pure a = Parser (\s _ sc -> sc a s)
 
 instance altParser :: Alt Parser where
-  alt p1 p2 = Parser (\s fc sc ->
-    unParser p1 s (\pos msg ->
-      if s.pos == pos
-      then unParser p2 s fc sc
-      else fc pos msg)
-      sc)
+  alt p1 p2 = Parser (\s fc sc -> 
+    unParser p1 s (\_ _ -> unParser p2 s fc sc) sc)
 
 instance plusParser :: Plus Parser where
   empty = fail "No alternative"
