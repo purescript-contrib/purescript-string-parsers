@@ -29,8 +29,6 @@ import Control.Alt ((<|>))
 import Text.Parsing.StringParser.Combinators (many, (<?>))
 import Text.Parsing.StringParser
 
-import qualified Data.String.Regex as Rx
-
 -- | Match the end of the file.
 eof :: Parser Unit
 eof = Parser (\s fc sc -> case s of
@@ -46,16 +44,11 @@ anyChar = Parser (\s fc sc -> case s of
 
 -- | Match any digit.
 anyDigit :: Parser Char
-anyDigit = Parser \{ str: str, pos: i } fc sc -> case charAt i str of
-  Just chr ->
-    let chrS = fromChar chr
-    in if Rx.test rxDigit chrS
-       then sc chr { str: str, pos: i + 1 }
-       else fc i (ParseError "Expected digit")
-  Nothing -> fc i (ParseError "Unexpected EOF")
-  where
-  rxDigit :: Rx.Regex
-  rxDigit = Rx.regex "^[0-9]" Rx.noFlags
+anyDigit = try do
+  c <- anyChar
+  if c >= '0' && c <= '9'
+     then return c
+     else fail $ "Character " <> toString c <> " is not a digit"
 
 -- | Match the specified string.
 string :: String -> Parser String

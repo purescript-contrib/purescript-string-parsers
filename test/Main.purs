@@ -72,5 +72,7 @@ main = do
   parseTest opTest "a+b+c"
   parseTest exprTest "1*2+3/4-5"
   parseTest tryTest "aacc"
+  parseTest (many1 anyDigit) "01234/" 
+  parseTest (many1 anyDigit) "56789:" 
   parseTest alphaNum "A"
   parseTest (string "bc" <|> string "bd") "bd"
