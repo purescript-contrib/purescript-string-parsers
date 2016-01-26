@@ -72,3 +72,5 @@ main = do
   parseTest opTest "a+b+c"
   parseTest exprTest "1*2+3/4-5"
   parseTest tryTest "aacc"
+  parseTest (many1 anyDigit) "0/" 
+  parseTest (many1 anyDigit) "9:" 
