@@ -9,7 +9,6 @@ module Text.Parsing.StringParser.Expr
 
 import Prelude
 
-import Data.Either
 import Data.Foldable
 import Data.List (List(..))
 
