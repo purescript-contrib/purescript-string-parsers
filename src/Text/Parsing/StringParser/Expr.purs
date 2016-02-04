@@ -1,6 +1,6 @@
 -- | This module defines helper functions for defining parsers using operator tables.
 
-module Text.Parsing.StringParser.Expr 
+module Text.Parsing.StringParser.Expr
   ( Assoc(..)
   , Operator(..)
   , OperatorTable()
@@ -9,7 +9,6 @@ module Text.Parsing.StringParser.Expr
 
 import Prelude
 
-import Data.Either
 import Data.Foldable
 import Data.List (List(..))
 
@@ -59,14 +58,14 @@ buildExprParser operators simpleExpr =
           <|> return x
           <?> "operator"
 
-    splitOp :: forall a. Operator a -> SplitAccum a -> SplitAccum a
+    splitOp :: forall b. Operator b -> SplitAccum b -> SplitAccum b
     splitOp (Infix op AssocNone)  accum = accum { nassoc  = Cons op accum.nassoc }
     splitOp (Infix op AssocLeft)  accum = accum { lassoc  = Cons op accum.lassoc }
     splitOp (Infix op AssocRight) accum = accum { rassoc  = Cons op accum.rassoc }
     splitOp (Prefix  op)          accum = accum { prefix  = Cons op accum.prefix }
     splitOp (Postfix op)          accum = accum { postfix = Cons op accum.postfix }
 
-    rassocP :: forall a b c. a -> Parser (a -> a -> a) -> Parser (b -> c) -> Parser b -> Parser (c -> a) -> Parser a
+    rassocP :: forall b c d. b -> Parser (b -> b -> b) -> Parser (c -> d) -> Parser c -> Parser (d -> b) -> Parser b
     rassocP x rassocOp prefixP term postfixP = do
       f <- rassocOp
       y <- do
@@ -74,25 +73,25 @@ buildExprParser operators simpleExpr =
         rassocP1 z rassocOp prefixP term postfixP
       return (f x y)
 
-    rassocP1 :: forall a b c. a -> Parser (a -> a -> a) -> Parser (b -> c) -> Parser b -> Parser (c -> a) -> Parser a
+    rassocP1 :: forall b c d. b -> Parser (b -> b -> b) -> Parser (c -> d) -> Parser c -> Parser (d -> b) -> Parser b
     rassocP1 x rassocOp prefixP term postfixP = rassocP x rassocOp prefixP term postfixP <|> return x
 
-    lassocP :: forall a b c. a -> Parser (a -> a -> a) -> Parser (b -> c) -> Parser b -> Parser (c -> a) -> Parser a
+    lassocP :: forall b c d. b -> Parser (b -> b -> b) -> Parser (c -> d) -> Parser c -> Parser (d -> b) -> Parser b
     lassocP x lassocOp prefixP term postfixP = do
       f <- lassocOp
       y <- termP prefixP term postfixP
       lassocP1 (f x y) lassocOp prefixP term postfixP
 
-    lassocP1 :: forall a b c. a -> Parser (a -> a -> a) -> Parser (b -> c) -> Parser b -> Parser (c -> a) -> Parser a
+    lassocP1 :: forall b c d. b -> Parser (b -> b -> b) -> Parser (c -> d) -> Parser c -> Parser (d -> b) -> Parser b
     lassocP1 x lassocOp prefixP term postfixP = lassocP x lassocOp prefixP term postfixP <|> return x
 
-    nassocP :: forall a b c d e. a -> Parser (a -> d -> e) -> Parser (b -> c) -> Parser b -> Parser (c -> d) -> Parser e
+    nassocP :: forall b c d. b -> Parser (b -> b -> b) -> Parser (c -> d) -> Parser c -> Parser (d -> b) -> Parser b
     nassocP x nassocOp prefixP term postfixP = do
       f <- nassocOp
       y <- termP prefixP term postfixP
       return (f x y)
 
-    termP :: forall a b c. Parser (a -> b) -> Parser a -> Parser (b -> c) -> Parser c
+    termP :: forall b c d. Parser (b -> c) -> Parser b -> Parser (c -> d) -> Parser d
     termP prefixP term postfixP = do
       pre   <- prefixP
       x     <- term
