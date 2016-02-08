@@ -104,8 +104,8 @@ upperCaseChar = do
 
 -- | Match any letter.
 anyLetter :: Parser Char
-anyLetter = lowerCaseChar <|> upperCaseChar <?> "Expected a letter"
+anyLetter = try lowerCaseChar <|> upperCaseChar <?> "Expected a letter"
 
 -- | Match a letter or a number.
 alphaNum :: Parser Char
-alphaNum = anyLetter <|> anyDigit <?> "Expected a letter or a number"
+alphaNum = try anyLetter <|> anyDigit <?> "Expected a letter or a number"
