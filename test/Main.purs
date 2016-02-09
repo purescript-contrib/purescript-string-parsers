@@ -77,4 +77,7 @@ main = do
   parseTest alphaNum "A"
   parseTest alphaNum "a"
   parseTest alphaNum "1"
-  parseTest (string "bc" <|> string "bd") "bd"
+  parseTest (try lowerCaseChar <|> upperCaseChar) "U"
+  parseTest (string "a" <|> string "ok") "ok"
+  parseTest (string "failure at 2 chars" <|> string "fawat") "fano"
+  parseTest (try (string "no") <|> string "ok") "ok"

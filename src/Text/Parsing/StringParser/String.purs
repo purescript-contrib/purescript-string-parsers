@@ -54,7 +54,15 @@ anyDigit = try do
 string :: String -> Parser String
 string nt = Parser (\s fc sc -> case s of
   { str = str, pos = i } | indexOf' nt i str == Just i -> sc nt { str: str, pos: i + length nt }
-  { pos = i } -> fc i (ParseError $ "Expected '" ++ nt ++ "'."))
+  { str = str, pos = i } ->
+          let pref = commonPrefix 0 i str
+              msg = "Expected '" ++ nt ++ "', failed after " ++ show pref ++ " chars."
+           in fc (i + pref) (ParseError msg))
+  where
+  commonPrefix offset distance str =
+    if charAt offset nt == charAt (offset + distance) str
+       then commonPrefix (offset + 1) distance str
+       else offset
 
 -- | Match a character satisfying the given predicate.
 satisfy :: (Char -> Boolean) -> Parser Char
