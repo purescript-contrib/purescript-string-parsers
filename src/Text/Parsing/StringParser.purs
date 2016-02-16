@@ -2,14 +2,14 @@
 
 module Text.Parsing.StringParser where
 
-import Prelude
+import Prelude (class Monad, class Bind, class Applicative, class Apply, class Functor, class Eq, class Show, (==))
 
 import Data.Either (Either(..))
 
-import Control.Alt
-import Control.Alternative
-import Control.MonadPlus
-import Control.Plus
+import Control.Alt (class Alt)
+import Control.Alternative (class Alternative)
+import Control.MonadPlus (class MonadPlus)
+import Control.Plus (class Plus)
 
 -- | A poition in an input string.
 type Pos = Int
@@ -25,7 +25,7 @@ type Pos = Int
 type PosString = { str :: String, pos :: Pos }
 
 -- | The type of parsing errors.
-data ParseError = ParseError String
+newtype ParseError = ParseError String
 
 instance showParseError :: Show ParseError where
   show (ParseError msg) = msg
@@ -35,7 +35,7 @@ instance eqParseError :: Eq ParseError where
 
 -- | A parser is represented as a function which takes a pair of
 -- | continuations for failure and success.
-data Parser a = Parser (forall r. PosString -> (Pos -> ParseError -> r) -> (a -> PosString -> r) -> r)
+newtype Parser a = Parser (forall r. PosString -> (Pos -> ParseError -> r) -> (a -> PosString -> r) -> r)
 
 -- | Run a parser by providing success and failure continuations.
 unParser :: forall a r. Parser a -> PosString -> (Pos -> ParseError -> r) -> (a -> PosString -> r) -> r

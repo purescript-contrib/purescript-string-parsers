@@ -26,15 +26,21 @@ many1 :: forall a. Parser a -> Parser (List a)
 
 Match one or more times.
 
+#### `orFailWith`
+
+``` purescript
+orFailWith :: forall a. Parser a -> String -> Parser a
+```
+
+Provide an error message in case of failure.
+
 #### `(<?>)`
 
 ``` purescript
-(<?>) :: forall a. Parser a -> String -> Parser a
+infix 0 orFailWith as <?>
 ```
 
-_left-associative / precedence -1_
-
-Provide an error message in case of failure.
+_non-associative / precedence 0_
 
 #### `fix`
 

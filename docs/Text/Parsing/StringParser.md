@@ -28,7 +28,7 @@ every time we match a character.
 #### `ParseError`
 
 ``` purescript
-data ParseError
+newtype ParseError
   = ParseError String
 ```
 
@@ -36,14 +36,14 @@ The type of parsing errors.
 
 ##### Instances
 ``` purescript
-instance showParseError :: Show ParseError
-instance eqParseError :: Eq ParseError
+Show ParseError
+Eq ParseError
 ```
 
 #### `Parser`
 
 ``` purescript
-data Parser a
+newtype Parser a
   = Parser (forall r. PosString -> (Pos -> ParseError -> r) -> (a -> PosString -> r) -> r)
 ```
 
@@ -52,15 +52,15 @@ continuations for failure and success.
 
 ##### Instances
 ``` purescript
-instance functorParser :: Functor Parser
-instance applyParser :: Apply Parser
-instance applicativeParser :: Applicative Parser
-instance altParser :: Alt Parser
-instance plusParser :: Plus Parser
-instance alternativeParser :: Alternative Parser
-instance bindParser :: Bind Parser
-instance monadParser :: Monad Parser
-instance monadPlusParser :: MonadPlus Parser
+Functor Parser
+Apply Parser
+Applicative Parser
+Alt Parser
+Plus Parser
+Alternative Parser
+Bind Parser
+Monad Parser
+MonadPlus Parser
 ```
 
 #### `unParser`
