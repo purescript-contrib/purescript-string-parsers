@@ -2,16 +2,16 @@
 
 module Text.Parsing.StringParser.Combinators where
 
-import Prelude
+import Prelude (Unit, return, bind, ($), (<$>), unit, (>>=))
 
 import Data.Maybe (Maybe(..))
 import Data.List (List(..), singleton)
-import Data.Foldable (Foldable, foldl)
+import Data.Foldable (class Foldable, foldl)
 
 import Control.Alt ((<|>))
 import Control.Apply ((*>))
 
-import Text.Parsing.StringParser
+import Text.Parsing.StringParser (Parser(Parser), fail, unParser)
 
 -- | Read ahead without consuming input.
 lookAhead :: forall a. Parser a -> Parser a
@@ -29,8 +29,10 @@ many1 p = do
   return (Cons a as)
 
 -- | Provide an error message in case of failure.
-(<?>) :: forall a. Parser a -> String -> Parser a
-(<?>) p msg = p <|> fail msg
+orFailWith :: forall a. Parser a -> String -> Parser a
+orFailWith p msg = p <|> fail msg
+
+infix 0 orFailWith as <?>
 
 -- | Take the fixed point of a parser function. This function is sometimes useful when building recursive parsers.
 fix :: forall a. (Parser a -> Parser a) -> Parser a

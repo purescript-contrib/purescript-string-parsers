@@ -7,15 +7,15 @@ module Text.Parsing.StringParser.Expr
   , buildExprParser
   ) where
 
-import Prelude
+import Prelude (return, bind, id)
 
-import Data.Foldable
+import Data.Foldable (foldl, foldr)
 import Data.List (List(..))
 
-import Control.Alt
+import Control.Alt ((<|>))
 
-import Text.Parsing.StringParser
-import Text.Parsing.StringParser.Combinators
+import Text.Parsing.StringParser (Parser)
+import Text.Parsing.StringParser.Combinators ((<?>), choice)
 
 -- | Operator associativity types.
 data Assoc = AssocNone | AssocLeft | AssocRight

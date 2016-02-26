@@ -17,17 +17,16 @@ module Text.Parsing.StringParser.String
   , alphaNum
   ) where
 
-import Prelude
+import Prelude (Unit, (<>), ($), return, (<=), (&&), (>=), bind, flip, (<<<), void, (==), (||), (++), (+), unit, (<))
 
 import Data.Maybe (Maybe(..))
-import Data.String (charAt, fromChar, length, indexOf', fromCharArray)
-import Data.Char (toString, toCharCode)
-import Data.Foldable (Foldable, foldMap, elem, notElem)
-import Data.Array ((..))
+import Data.String (charAt, length, indexOf')
+import Data.Char (toString)
+import Data.Foldable (class Foldable, foldMap, elem, notElem)
 import Control.Alt ((<|>))
 
 import Text.Parsing.StringParser.Combinators (many, (<?>))
-import Text.Parsing.StringParser
+import Text.Parsing.StringParser (ParseError(ParseError),  Parser(Parser), fail, try)
 
 -- | Match the end of the file.
 eof :: Parser Unit
@@ -90,7 +89,7 @@ noneOf = satisfy <<< flip notElem
 lowerCaseChar :: Parser Char
 lowerCaseChar = do
   c <- anyChar
-  if toCharCode c `elem` (97 .. 122)
+  if c >= 'a' && c <= 'z'
      then return c
      else fail $ "Expected a lower case character but found '" <> toString c <> "'"
 
@@ -98,7 +97,7 @@ lowerCaseChar = do
 upperCaseChar :: Parser Char
 upperCaseChar = do
   c <- anyChar
-  if toCharCode c `elem` (65 .. 90)
+  if c >= 'A' && c <= 'Z'
      then return c
      else fail $ "Expected an upper case character but found '" <> toString c <> "'"
 
