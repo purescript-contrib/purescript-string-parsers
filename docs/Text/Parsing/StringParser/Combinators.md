@@ -26,15 +26,19 @@ many1 :: forall a. Parser a -> Parser (List a)
 
 Match one or more times.
 
+#### `withError`
+
+``` purescript
+withError :: forall a. Parser a -> String -> Parser a
+```
+
+Provide an error message in case of failure.
+
 #### `(<?>)`
 
 ``` purescript
-(<?>) :: forall a. Parser a -> String -> Parser a
+infixl 3 withError as <?>
 ```
-
-_left-associative / precedence -1_
-
-Provide an error message in case of failure.
 
 #### `fix`
 
@@ -74,7 +78,7 @@ Attempt to parse a value.
 optionMaybe :: forall a. Parser a -> Parser (Maybe a)
 ```
 
-Attempt to parse a value, returning `Nothing` in case of failure.
+Attempt to parse a value, pureing `Nothing` in case of failure.
 
 #### `sepBy`
 
@@ -175,7 +179,7 @@ Parse one or more values separated by a right-associative operator.
 #### `choice`
 
 ``` purescript
-choice :: forall f a. (Foldable f) => f (Parser a) -> Parser a
+choice :: forall f a. Foldable f => f (Parser a) -> Parser a
 ```
 
 Parse using any of a collection of parsers.

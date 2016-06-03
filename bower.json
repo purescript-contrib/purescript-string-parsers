@@ -30,7 +30,6 @@
     "purescript-lists": "^1.0.0"
   },
   "devDependencies": {
-    "purescript-math": "^2.0.0",
-    "purescript-quickcheck": "^1.0.0"
+    "purescript-math": "^2.0.0"
   }
 }

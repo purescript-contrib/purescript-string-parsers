@@ -69,7 +69,7 @@ Skip many whitespace characters.
 #### `oneOf`
 
 ``` purescript
-oneOf :: forall f. (Foldable f) => f Char -> Parser Char
+oneOf :: forall f. Foldable f => f Char -> Parser Char
 ```
 
 Match one of the characters in the foldable structure.
@@ -77,7 +77,7 @@ Match one of the characters in the foldable structure.
 #### `noneOf`
 
 ``` purescript
-noneOf :: forall f. (Foldable f) => f Char -> Parser Char
+noneOf :: forall f. Foldable f => f Char -> Parser Char
 ```
 
 Match any character not in the foldable structure.

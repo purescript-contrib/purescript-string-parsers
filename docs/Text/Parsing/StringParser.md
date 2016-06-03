@@ -36,15 +36,15 @@ The type of parsing errors.
 
 ##### Instances
 ``` purescript
-instance showParseError :: Show ParseError
-instance eqParseError :: Eq ParseError
+Show ParseError
+Eq ParseError
 ```
 
 #### `Parser`
 
 ``` purescript
 data Parser a
-  = Parser (forall r. PosString -> (Pos -> ParseError -> r) -> (a -> PosString -> r) -> r)
+  = Parser (PosString -> Either { pos :: Pos, error :: ParseError } { result :: a, suffix :: PosString })
 ```
 
 A parser is represented as a function which takes a pair of
@@ -52,21 +52,23 @@ continuations for failure and success.
 
 ##### Instances
 ``` purescript
-instance functorParser :: Functor Parser
-instance applyParser :: Apply Parser
-instance applicativeParser :: Applicative Parser
-instance altParser :: Alt Parser
-instance plusParser :: Plus Parser
-instance alternativeParser :: Alternative Parser
-instance bindParser :: Bind Parser
-instance monadParser :: Monad Parser
-instance monadPlusParser :: MonadPlus Parser
+Functor Parser
+Apply Parser
+Applicative Parser
+Alt Parser
+Plus Parser
+Alternative Parser
+Bind Parser
+Monad Parser
+MonadZero Parser
+MonadPlus Parser
+MonadRec Parser
 ```
 
 #### `unParser`
 
 ``` purescript
-unParser :: forall a r. Parser a -> PosString -> (Pos -> ParseError -> r) -> (a -> PosString -> r) -> r
+unParser :: forall a. Parser a -> PosString -> Either { pos :: Pos, error :: ParseError } { result :: a, suffix :: PosString }
 ```
 
 Run a parser by providing success and failure continuations.
