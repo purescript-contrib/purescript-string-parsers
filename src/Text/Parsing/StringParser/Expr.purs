@@ -9,13 +9,11 @@ module Text.Parsing.StringParser.Expr
 
 import Prelude
 
-import Data.Foldable
+import Control.Alt ((<|>))
+import Data.Foldable (foldl, foldr)
 import Data.List (List(..))
-
-import Control.Alt
-
-import Text.Parsing.StringParser
-import Text.Parsing.StringParser.Combinators
+import Text.Parsing.StringParser (Parser)
+import Text.Parsing.StringParser.Combinators (choice, (<?>))
 
 -- | Operator associativity types.
 data Assoc = AssocNone | AssocLeft | AssocRight
@@ -48,14 +46,14 @@ buildExprParser operators simpleExpr =
         prefixOp  = choice accum.prefix <?> ""
         postfixOp = choice accum.postfix <?> ""
 
-        postfixP = postfixOp <|> return id
-        prefixP  = prefixOp <|> return id
+        postfixP = postfixOp <|> pure id
+        prefixP  = prefixOp <|> pure id
       in do
         x <- termP prefixP term postfixP
         rassocP x rassocOp prefixP term postfixP
           <|> lassocP x lassocOp prefixP term postfixP
           <|> nassocP x nassocOp prefixP term postfixP
-          <|> return x
+          <|> pure x
           <?> "operator"
 
     splitOp :: forall b. Operator b -> SplitAccum b -> SplitAccum b
@@ -71,10 +69,10 @@ buildExprParser operators simpleExpr =
       y <- do
         z <- termP prefixP term postfixP
         rassocP1 z rassocOp prefixP term postfixP
-      return (f x y)
+      pure (f x y)
 
     rassocP1 :: forall b c d. b -> Parser (b -> b -> b) -> Parser (c -> d) -> Parser c -> Parser (d -> b) -> Parser b
-    rassocP1 x rassocOp prefixP term postfixP = rassocP x rassocOp prefixP term postfixP <|> return x
+    rassocP1 x rassocOp prefixP term postfixP = rassocP x rassocOp prefixP term postfixP <|> pure x
 
     lassocP :: forall b c d. b -> Parser (b -> b -> b) -> Parser (c -> d) -> Parser c -> Parser (d -> b) -> Parser b
     lassocP x lassocOp prefixP term postfixP = do
@@ -83,19 +81,19 @@ buildExprParser operators simpleExpr =
       lassocP1 (f x y) lassocOp prefixP term postfixP
 
     lassocP1 :: forall b c d. b -> Parser (b -> b -> b) -> Parser (c -> d) -> Parser c -> Parser (d -> b) -> Parser b
-    lassocP1 x lassocOp prefixP term postfixP = lassocP x lassocOp prefixP term postfixP <|> return x
+    lassocP1 x lassocOp prefixP term postfixP = lassocP x lassocOp prefixP term postfixP <|> pure x
 
     nassocP :: forall b c d. b -> Parser (b -> b -> b) -> Parser (c -> d) -> Parser c -> Parser (d -> b) -> Parser b
     nassocP x nassocOp prefixP term postfixP = do
       f <- nassocOp
       y <- termP prefixP term postfixP
-      return (f x y)
+      pure (f x y)
 
     termP :: forall b c d. Parser (b -> c) -> Parser b -> Parser (c -> d) -> Parser d
     termP prefixP term postfixP = do
       pre   <- prefixP
       x     <- term
       post  <- postfixP
-      return (post (pre x))
+      pure (post (pre x))
 
   in foldl (makeParser) simpleExpr operators
