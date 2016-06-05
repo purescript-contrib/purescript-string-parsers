@@ -1,16 +1,17 @@
 module Test.Main where
 
-import Prelude hiding (between)
 import Control.Alt ((<|>))
 import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Console (CONSOLE, logShow)
+import Control.Monad.Eff.Console (log, error, CONSOLE, logShow)
 import Data.Either (Either(..))
 import Data.Functor (($>))
-import Data.String (singleton)
+import Data.String (joinWith, singleton)
+import Data.Unfoldable (replicate)
 import Text.Parsing.StringParser (Parser, ParseError(..), try, runParser)
 import Text.Parsing.StringParser.Combinators (many1, endBy1, sepBy1, optionMaybe, many, chainl, fix, between)
 import Text.Parsing.StringParser.Expr (Assoc(..), Operator(..), buildExprParser)
 import Text.Parsing.StringParser.String (anyDigit, eof, string, anyChar)
+import Prelude hiding (between)
 
 parens :: forall a. Parser a -> Parser a
 parens = between (string "(") (string ")")
@@ -25,6 +26,12 @@ parseTest p input =
   case runParser p input of
     Left (ParseError err) -> logShow err
     Right result -> logShow result
+
+parseTestQuiet :: forall a eff. Show a => String -> Parser a -> String -> Eff (console :: CONSOLE | eff) Unit
+parseTestQuiet msg p input =
+  case runParser p input of
+    Left (ParseError err) -> error $ "Error: " <> msg
+    Right result -> log $ "Success: " <> msg
 
 opTest :: Parser String
 opTest = chainl (singleton <$> anyChar) (string "+" $> append) ""
@@ -54,6 +61,8 @@ tryTest = try ((<>) <$> string "aa" <*> string "bb") <|>
 
 main :: forall e. Eff (console :: CONSOLE | e) Unit
 main = do
+  -- does it blow the stack?
+  parseTestQuiet "100k a's" (many (string "a")) (joinWith "" $ replicate 100000 "a")
   parseTest nested "(((a)))"
   parseTest (many (string "a")) "aaa"
   parseTest (parens (do
