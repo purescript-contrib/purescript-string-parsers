@@ -1,17 +1,19 @@
 module Test.Main where
 
-import Prelude hiding (between)
 import Control.Alt ((<|>))
 import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Console (CONSOLE, logShow)
-import Data.CommutativeRing (sub)
-import Data.Either (Either(..))
+import Control.Monad.Eff.Console (CONSOLE)
+import Data.Either (isLeft, isRight, Either(..))
 import Data.Functor (($>))
-import Data.String (singleton)
-import Text.Parsing.StringParser (Parser, ParseError(..), try, runParser)
+import Data.List (List(Nil), (:))
+import Data.String (joinWith, singleton)
+import Data.Unfoldable (replicate)
+import Test.Assert (assert', ASSERT, assert)
+import Text.Parsing.StringParser (Parser, runParser, try)
 import Text.Parsing.StringParser.Combinators (many1, endBy1, sepBy1, optionMaybe, many, chainl, fix, between)
 import Text.Parsing.StringParser.Expr (Assoc(..), Operator(..), buildExprParser)
 import Text.Parsing.StringParser.String (anyDigit, eof, string, anyChar)
+import Prelude hiding (between)
 
 parens :: forall a. Parser a -> Parser a
 parens = between (string "(") (string ")")
@@ -20,12 +22,6 @@ nested :: Parser Int
 nested = fix $ \p -> (do
   string "a"
   pure 0) <|> ((+) 1) <$> parens p
-
-parseTest :: forall a eff. Show a => Parser a -> String -> Eff (console :: CONSOLE | eff) Unit
-parseTest p input =
-  case runParser p input of
-    Left (ParseError err) -> logShow err
-    Right result -> logShow result
 
 opTest :: Parser String
 opTest = chainl (singleton <$> anyChar) (string "+" $> append) ""
@@ -53,20 +49,36 @@ tryTest :: Parser String
 tryTest = try ((<>) <$> string "aa" <*> string "bb") <|>
           (<>) <$> string "aa" <*> string "cc"
 
-main :: forall e. Eff (console :: CONSOLE | e) Unit
+canParse :: forall a. Parser a -> String -> Boolean
+canParse p input = isRight $ runParser p input
+
+parseFail :: forall a. Parser a -> String -> Boolean
+parseFail p input = isLeft $ runParser p input
+
+expectResult :: forall a. (Eq a) => a -> Parser a -> String -> Boolean
+expectResult res p input = runParser p input == Right res
+
+main :: forall e. Eff (console :: CONSOLE, assert :: ASSERT | e) Unit
 main = do
-  parseTest nested "(((a)))"
-  parseTest (many (string "a")) "aaa"
-  parseTest (parens (do
+  assert' "many should not blow the stack" $ canParse (many (string "a")) (joinWith "" $ replicate 100000 "a")
+  assert' "many failing after" $ parseFail (do
+    as <- many (string "a")
+    eof
+    pure as) (joinWith "" (replicate 100000 "a") <> "b" )
+
+  assert $ expectResult 3 nested "(((a)))"
+  assert $ expectResult ("a":"a":"a":Nil)  (many (string "a")) "aaa"
+  assert $ parseFail (many1 (string "a")) ""
+  assert $ canParse (parens (do
     string "a"
     optionMaybe $ string "b")) "(ab)"
-  parseTest (string "a" `sepBy1` string ",") "a,a,a"
-  parseTest (do
+  assert $ expectResult ("a":"a":"a":Nil) (string "a" `sepBy1` string ",") "a,a,a"
+  assert $ canParse (do
     as <- string "a" `endBy1` string ","
     eof
     pure as) "a,a,a,"
-  parseTest opTest "a+b+c"
-  parseTest exprTest "1*2+3/4-5"
-  parseTest tryTest "aacc"
-  parseTest (many1 anyDigit) "01234/"
-  parseTest (many1 anyDigit) "56789:"
+  assert' "opTest" $ expectResult "abc" opTest "a+b+c"
+  assert' "exprTest" $ expectResult (-3) exprTest "1*2+3/4-5"
+  assert' "tryTest "$ canParse tryTest "aacc"
+  assert $ expectResult ('0':'1':'2':'3':'4':Nil) (many1 anyDigit) "01234/"
+  assert $ expectResult ('5':'6':'7':'8':'9':Nil) (many1 anyDigit) "56789:"

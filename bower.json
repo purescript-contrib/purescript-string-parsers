@@ -27,9 +27,12 @@
     "purescript-strings": "^1.0.0",
     "purescript-foldable-traversable": "^1.0.0",
     "purescript-either": "^1.0.0",
-    "purescript-lists": "^1.0.0"
+    "purescript-lists": "^1.0.0",
+    "purescript-tailrec": "^1.0.0"
   },
   "devDependencies": {
-    "purescript-math": "^2.0.0"
+    "purescript-math": "^2.0.0",
+    "purescript-console": "^1.0.0",
+    "purescript-assert": "^1.0.0"
   }
 }
