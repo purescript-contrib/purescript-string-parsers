@@ -30,6 +30,7 @@
   },
   "devDependencies": {
     "purescript-math": "^2.0.0",
-    "purescript-console": "^2.0.0"
+    "purescript-console": "^2.0.0",
+    "purescript-assert": "^2.0.0"
   }
 }

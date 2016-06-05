@@ -4,12 +4,14 @@ module Text.Parsing.StringParser.Combinators where
 
 import Prelude
 
-import Data.Either (Either(..))
-import Data.Maybe (Maybe(..))
-import Data.List (List(..), singleton)
-import Data.Foldable (class Foldable, foldl)
-
 import Control.Alt ((<|>))
+import Control.Monad.Rec.Class (Step(..), tailRecM)
+
+import Data.Bifunctor (bimap)
+import Data.Either (Either(..))
+import Data.Foldable (class Foldable, foldl)
+import Data.List (reverse, List(..), singleton)
+import Data.Maybe (Maybe(..))
 
 import Text.Parsing.StringParser (Parser(..), fail, unParser)
 
@@ -22,14 +24,16 @@ lookAhead (Parser p) = Parser \s ->
 
 -- | Match zero or more times.
 many :: forall a. Parser a -> Parser (List a)
-many p = many1 p <|> pure Nil
+many p = tailRecM go Nil
+  where
+  go :: List a -> Parser (Step (List a) (List a))
+  go acc = do
+    aa <- (Loop <$> p) <|> pure (Done unit)
+    pure $ bimap (flip Cons acc) (\_ -> reverse acc) aa
 
 -- | Match one or more times.
 many1 :: forall a. Parser a -> Parser (List a)
-many1 p = do
-  a <- p
-  as <- many p
-  pure (Cons a as)
+many1 p = Cons <$> p <*> many p
 
 -- | Provide an error message in case of failure.
 withError :: forall a. Parser a -> String -> Parser a
