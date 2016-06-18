@@ -10,7 +10,7 @@ import Data.String (singleton)
 import Text.Parsing.StringParser (Parser, ParseError(..), try, runParser)
 import Text.Parsing.StringParser.Combinators (many1, endBy1, sepBy1, optionMaybe, many, chainl, fix, between)
 import Text.Parsing.StringParser.Expr (Assoc(..), Operator(..), buildExprParser)
-import Text.Parsing.StringParser.String (anyDigit, eof, string, anyChar)
+import Text.Parsing.StringParser.String (anyDigit, eof, string, anyChar, anyLetter, alphaNum)
 
 parens :: forall a. Parser a -> Parser a
 parens = between (string "(") (string ")")
@@ -69,3 +69,5 @@ main = do
   parseTest tryTest "aacc"
   parseTest (many1 anyDigit) "01234/"
   parseTest (many1 anyDigit) "56789:"
+  parseTest (many anyLetter) "aB"
+  parseTest (many alphaNum) "aB3"

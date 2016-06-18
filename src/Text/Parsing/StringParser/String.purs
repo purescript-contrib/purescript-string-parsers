@@ -90,7 +90,7 @@ noneOf = satisfy <<< flip notElem
 
 -- | Match any lower case character.
 lowerCaseChar :: Parser Char
-lowerCaseChar = do
+lowerCaseChar = try do
   c <- anyChar
   if toCharCode c `elem` (97 .. 122)
      then pure c
@@ -98,7 +98,7 @@ lowerCaseChar = do
 
 -- | Match any upper case character.
 upperCaseChar :: Parser Char
-upperCaseChar = do
+upperCaseChar = try do
   c <- anyChar
   if toCharCode c `elem` (65 .. 90)
      then pure c
