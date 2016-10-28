@@ -4,16 +4,14 @@
   "keywords": [
     "purescript"
   ],
+  "license": "MIT",
   "ignore": [
     "**/.*",
     "bower_components",
     "node_modules",
     "output",
     "tests",
-    "js",
-    "tmp",
     "bower.json",
-    "Gruntfile.js",
     "package.json"
   ],
   "repository": {
