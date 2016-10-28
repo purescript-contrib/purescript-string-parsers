@@ -25,7 +25,7 @@
     "purescript-strings": "^2.0.2",
     "purescript-foldable-traversable": "^2.0.0",
     "purescript-either": "^2.0.0",
-    "purescript-lists": "^3.0.1",
+    "purescript-lists": "^3.1.0",
     "purescript-tailrec": "^2.0.0"
   },
   "devDependencies": {
