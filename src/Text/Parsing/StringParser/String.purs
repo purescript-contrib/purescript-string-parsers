@@ -25,7 +25,7 @@ import Data.Char (toCharCode)
 import Data.Either (Either(..))
 import Data.Foldable (class Foldable, foldMap, elem, notElem)
 import Data.Maybe (Maybe(..))
-import Data.String (charAt, length, indexOf', singleton)
+import Data.String (Pattern(..), charAt, length, indexOf', singleton)
 import Text.Parsing.StringParser (Parser(..), ParseError(..), try, fail)
 import Text.Parsing.StringParser.Combinators (many, (<?>))
 
@@ -55,7 +55,7 @@ anyDigit = try do
 string :: String -> Parser String
 string nt = Parser \s ->
   case s of
-    { str, pos } | indexOf' nt pos str == Just pos -> Right { result: nt, suffix: { str, pos: pos + length nt } }
+    { str, pos } | indexOf' (Pattern nt) pos str == Just pos -> Right { result: nt, suffix: { str, pos: pos + length nt } }
     { pos } -> Left { pos, error: ParseError ("Expected '" <> nt <> "'.") }
 
 -- | Match a character satisfying the given predicate.
