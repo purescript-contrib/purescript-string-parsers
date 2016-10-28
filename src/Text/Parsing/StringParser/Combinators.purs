@@ -1,17 +1,42 @@
 -- | This module defines combinators for building string parsers.
 
-module Text.Parsing.StringParser.Combinators where
+module Text.Parsing.StringParser.Combinators
+  ( lookAhead
+  , many
+  , many1
+  , withError, (<?>)
+  , between
+  , option
+  , optional
+  , optionMaybe
+  , sepBy
+  , sepBy1
+  , sepEndBy
+  , sepEndBy1
+  , endBy1
+  , endBy
+  , chainr
+  , chainl
+  , chainl1
+  , chainl1'
+  , chainr1
+  , chainr1'
+  , choice
+  , manyTill
+  , module Control.Lazy
+  ) where
 
 import Prelude
 
-import Data.Either (Either(..))
-import Data.Maybe (Maybe(..))
-import Data.List (List(..), singleton)
-import Data.Foldable (class Foldable, foldl)
-
 import Control.Alt ((<|>))
+import Control.Lazy (fix)
 
-import Text.Parsing.StringParser (Parser(..), fail, unParser)
+import Data.Either (Either(..))
+import Data.Foldable (class Foldable, foldl)
+import Data.List (List(..), singleton, manyRec)
+import Data.Maybe (Maybe(..))
+
+import Text.Parsing.StringParser (Parser(..), fail)
 
 -- | Read ahead without consuming input.
 lookAhead :: forall a. Parser a -> Parser a
@@ -22,24 +47,17 @@ lookAhead (Parser p) = Parser \s ->
 
 -- | Match zero or more times.
 many :: forall a. Parser a -> Parser (List a)
-many p = many1 p <|> pure Nil
+many = manyRec
 
 -- | Match one or more times.
 many1 :: forall a. Parser a -> Parser (List a)
-many1 p = do
-  a <- p
-  as <- many p
-  pure (Cons a as)
+many1 p = Cons <$> p <*> many p
 
 -- | Provide an error message in case of failure.
 withError :: forall a. Parser a -> String -> Parser a
 withError p msg = p <|> fail msg
 
 infixl 3 withError as <?>
-
--- | Take the fixed point of a parser function. This function is sometimes useful when building recursive parsers.
-fix :: forall a. (Parser a -> Parser a) -> Parser a
-fix f = Parser \s -> unParser (f (fix f)) s
 
 -- | Parse a string between opening and closing markers.
 between :: forall a open close. Parser open -> Parser close -> Parser a -> Parser a
