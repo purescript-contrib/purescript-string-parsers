@@ -10,7 +10,6 @@ import Data.List (List(..), singleton)
 import Data.Foldable (class Foldable, foldl)
 
 import Control.Alt ((<|>))
-import Control.Apply ((*>))
 
 import Text.Parsing.StringParser (Parser(..), fail, unParser)
 
@@ -40,7 +39,7 @@ infixl 3 withError as <?>
 
 -- | Take the fixed point of a parser function. This function is sometimes useful when building recursive parsers.
 fix :: forall a. (Parser a -> Parser a) -> Parser a
-fix f = Parser \s -> unParser (f (fix f)) s 
+fix f = Parser \s -> unParser (f (fix f)) s
 
 -- | Parse a string between opening and closing markers.
 between :: forall a open close. Parser open -> Parser close -> Parser a -> Parser a

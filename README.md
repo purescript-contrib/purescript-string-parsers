@@ -1,6 +1,8 @@
 # purescript-string-parsers
 
-[![Latest release](http://img.shields.io/bower/v/purescript-string-parsers.svg)](https://github.com/purescript-contrib/purescript-string-parsers/releases)
+[![Latest release](http://img.shields.io/github/release/purescript-contrib/purescript-string-parsers.svg)](https://github.com/purescript-contrib/purescript-string-parsers/releases)
+[![Build status](https://travis-ci.org/purescript-contrib/purescript-string-parsers.svg?branch=master)](https://travis-ci.org/purescript-contrib/purescript-string-parsers)
+[![Dependency status](https://img.shields.io/librariesio/github/purescript-contrib/purescript-string-parsers.svg)](https://libraries.io/github/purescript-contrib/purescript-string-parsers)
 [![Maintainer: paf31](https://img.shields.io/badge/maintainer-paf31-lightgrey.svg)](http://github.com/paf31)
 
 A parsing library for parsing strings.
@@ -11,4 +13,6 @@ This library is a simpler, faster alternative to `purescript-parsing`, for when 
 
     bower i purescript-string-parsers
 
-- [Module Documentation](docs/)
+## Documentation
+
+Module documentation is [published on Pursuit](http://pursuit.purescript.org/packages/purescript-string-parsers).

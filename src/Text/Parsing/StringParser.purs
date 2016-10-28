@@ -4,8 +4,9 @@ module Text.Parsing.StringParser where
 
 import Prelude
 import Control.MonadPlus (class MonadPlus, class MonadZero, class Alternative)
-import Control.Monad.Rec.Class (class MonadRec, tailRecM)
+import Control.Monad.Rec.Class (class MonadRec, tailRecM, Step(..))
 import Control.Plus (class Plus, class Alt)
+import Control.Lazy (class Lazy)
 import Data.Bifunctor (bimap, lmap)
 import Data.Either (Either(..))
 
@@ -33,7 +34,7 @@ instance eqParseError :: Eq ParseError where
 
 -- | A parser is represented as a function which takes a pair of
 -- | continuations for failure and success.
-data Parser a = Parser (PosString -> Either { pos :: Pos, error :: ParseError } { result :: a, suffix :: PosString })
+newtype Parser a = Parser (PosString -> Either { pos :: Pos, error :: ParseError } { result :: a, suffix :: PosString })
 
 -- | Run a parser by providing success and failure continuations.
 unParser :: forall a. Parser a -> PosString -> Either { pos :: Pos, error :: ParseError } { result :: a, suffix :: PosString }
@@ -81,8 +82,11 @@ instance monadPlusParser :: MonadPlus Parser
 instance monadRecParser :: MonadRec Parser where
   tailRecM f a = Parser \str -> tailRecM (\st -> map split (unParser (f st.state) st.str)) { state: a, str }
     where
-      split { result: Left state, suffix: str } = Left { state, str }
-      split { result: Right b, suffix } = Right { result: b, suffix }
+      split { result: Loop state, suffix: str } = Loop { state, str }
+      split { result: Done b, suffix } = Done { result: b, suffix }
+
+instance lazyParser :: Lazy (Parser a) where
+  defer f = Parser $ \str -> unParser (f unit) str
 
 -- | Fail with the specified message.
 fail :: forall a. String -> Parser a
