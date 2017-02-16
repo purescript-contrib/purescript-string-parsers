@@ -61,11 +61,7 @@ infixl 3 withError as <?>
 
 -- | Parse a string between opening and closing markers.
 between :: forall a open close. Parser open -> Parser close -> Parser a -> Parser a
-between open close p = do
-  open
-  a <- p
-  close
-  pure a
+between open close p = open *> p <* close
 
 -- | Parse a value with a default value in case of failure.
 option :: forall a. a -> Parser a -> Parser a
@@ -87,9 +83,7 @@ sepBy p sep = sepBy1 p sep <|> pure Nil
 sepBy1 :: forall a sep. Parser a -> Parser sep -> Parser (List a)
 sepBy1 p sep = do
   a <- p
-  as <- many $ do
-    sep
-    p
+  as <- many $ sep *> p
   pure (Cons a as)
 
 -- | Parse zero or more separated values, optionally ending with a separator.
@@ -100,23 +94,17 @@ sepEndBy p sep = sepEndBy1 p sep <|> pure Nil
 sepEndBy1 :: forall a sep. Parser a -> Parser sep -> Parser (List a)
 sepEndBy1 p sep = do
   a <- p
-  (do sep
+  (do _ <- sep
       as <- sepEndBy p sep
       pure (Cons a as)) <|> pure (singleton a)
 
 -- | Parse zero or more separated values, ending with a separator.
 endBy1 :: forall a sep. Parser a -> Parser sep -> Parser (List a)
-endBy1 p sep = many1 $ do
-  a <- p
-  sep
-  pure a
+endBy1 p sep = many1 $ p <* sep
 
 -- | Parse one or more separated values, ending with a separator.
 endBy :: forall a sep. Parser a -> Parser sep -> Parser (List a)
-endBy p sep = many $ do
-  a <- p
-  sep
-  pure a
+endBy p sep = many $ p <* sep
 
 -- | Parse zero or more values separated by a right-associative operator.
 chainr :: forall a. Parser a -> Parser (a -> a -> a) -> a -> Parser a
