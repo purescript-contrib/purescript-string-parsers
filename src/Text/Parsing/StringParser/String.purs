@@ -15,17 +15,22 @@ module Text.Parsing.StringParser.String
   , upperCaseChar
   , anyLetter
   , alphaNum
+  , regex'
+  , regex
   ) where
 
 import Prelude
 
 import Control.Alt ((<|>))
-import Data.Array ((..))
+import Data.Array ((..), uncons)
 import Data.Char (toCharCode)
 import Data.Either (Either(..))
 import Data.Foldable (class Foldable, foldMap, elem, notElem)
-import Data.Maybe (Maybe(..))
-import Data.String (Pattern(..), charAt, length, indexOf', singleton)
+import Data.Maybe (Maybe(..), fromMaybe)
+import Data.String (Pattern(..), charAt, drop, length, indexOf', singleton)
+import Data.String.Utils (startsWith)
+import Data.String.Regex as Regex
+import Data.String.Regex.Flags (noFlags)
 import Text.Parsing.StringParser (Parser(..), ParseError(..), try, fail)
 import Text.Parsing.StringParser.Combinators (many, (<?>))
 
@@ -111,3 +116,38 @@ anyLetter = lowerCaseChar <|> upperCaseChar <?> "Expected a letter"
 -- | Match a letter or a number.
 alphaNum :: Parser Char
 alphaNum = anyLetter <|> anyDigit <?> "Expected a letter or a number"
+
+-- | Build the regular expression from the pattern and match it, ensuring
+-- | that the pattern only attempts to match from the start of the target.
+regex' :: String -> Parser String
+regex' pat =
+    case er of
+      Left _ ->
+        fail $ "Illegal regex " <> pat
+      Right r ->
+        regex r
+    where
+      pattern =
+        if startsWith "^" pat then
+          pat
+        else
+          "^" <> pat
+      er = Regex.regex pattern noFlags
+
+-- | Match the regular expression.
+regex :: Regex.Regex -> Parser String
+regex r =
+  Parser \{ str, pos } ->
+    let
+      remainder = drop pos str
+    in
+      -- reduce the possible array of matches to 0 or 1 elements to aid Array pattern matching
+      case uncons $ fromMaybe [] $ Regex.match r remainder of
+        Just { head: Just matched, tail: _ }  ->
+          -- only accept matches at position 0
+          if startsWith matched remainder then
+            Right { result: matched, suffix: { str, pos: pos + length matched } }
+          else
+            Left { pos, error: ParseError $ "no match - consider prefacing the pattern with '^'" }
+        _ ->
+          Left { pos, error: ParseError $ "no match" }
