@@ -27,8 +27,7 @@ import Data.Char (toCharCode)
 import Data.Either (Either(..))
 import Data.Foldable (class Foldable, foldMap, elem, notElem)
 import Data.Maybe (Maybe(..), fromMaybe)
-import Data.String (Pattern(..), charAt, drop, length, indexOf', singleton)
-import Data.String.Utils (startsWith)
+import Data.String (Pattern(..), charAt, drop, length, indexOf', singleton, stripPrefix)
 import Data.String.Regex as Regex
 import Data.String.Regex.Flags (noFlags)
 import Text.Parsing.StringParser (Parser(..), ParseError(..), try, fail)
@@ -121,18 +120,18 @@ alphaNum = anyLetter <|> anyDigit <?> "Expected a letter or a number"
 -- | that the pattern only attempts to match from the start of the target.
 regex' :: String -> Parser String
 regex' pat =
-    case er of
+    case Regex.regex pattern noFlags of
       Left _ ->
-        fail $ "Illegal regex " <> pat
+        fail $ "Text.Parsing.StringParser.String.regex': illegal regex " <> pat
       Right r ->
         regex r
     where
       pattern =
-        if startsWith "^" pat then
-          pat
-        else
-          "^" <> pat
-      er = Regex.regex pattern noFlags
+        case stripPrefix (Pattern "^") pat of
+          Nothing ->
+            "^" <> pat
+          _ ->
+            pat
 
 -- | Match the regular expression.
 regex :: Regex.Regex -> Parser String
@@ -145,9 +144,10 @@ regex r =
       case uncons $ fromMaybe [] $ Regex.match r remainder of
         Just { head: Just matched, tail: _ }  ->
           -- only accept matches at position 0
-          if startsWith matched remainder then
-            Right { result: matched, suffix: { str, pos: pos + length matched } }
-          else
-            Left { pos, error: ParseError $ "no match - consider prefacing the pattern with '^'" }
+          case stripPrefix (Pattern matched) remainder of
+            Nothing ->
+              Left { pos, error: ParseError $ "Text.Parsing.StringParser.String.regex: no match - consider prefacing the pattern with '^'" }
+            _ ->
+              Right { result: matched, suffix: { str, pos: pos + length matched } }
         _ ->
           Left { pos, error: ParseError $ "no match" }
