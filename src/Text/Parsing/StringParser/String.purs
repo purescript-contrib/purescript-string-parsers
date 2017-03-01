@@ -15,17 +15,20 @@ module Text.Parsing.StringParser.String
   , upperCaseChar
   , anyLetter
   , alphaNum
+  , regex
   ) where
 
 import Prelude
 
 import Control.Alt ((<|>))
-import Data.Array ((..))
+import Data.Array ((..), uncons)
 import Data.Char (toCharCode)
 import Data.Either (Either(..))
 import Data.Foldable (class Foldable, foldMap, elem, notElem)
-import Data.Maybe (Maybe(..))
-import Data.String (Pattern(..), charAt, length, indexOf', singleton)
+import Data.Maybe (Maybe(..), fromMaybe)
+import Data.String (Pattern(..), charAt, drop, length, indexOf', singleton, stripPrefix)
+import Data.String.Regex as Regex
+import Data.String.Regex.Flags (noFlags)
 import Text.Parsing.StringParser (Parser(..), ParseError(..), try, fail)
 import Text.Parsing.StringParser.Combinators (many, (<?>))
 
@@ -111,3 +114,31 @@ anyLetter = lowerCaseChar <|> upperCaseChar <?> "Expected a letter"
 -- | Match a letter or a number.
 alphaNum :: Parser Char
 alphaNum = anyLetter <|> anyDigit <?> "Expected a letter or a number"
+
+-- | match the regular expression
+regex :: String -> Parser String
+regex pat =
+  case Regex.regex pattern noFlags of
+    Left _ ->
+      fail $ "Text.Parsing.StringParser.String.regex': illegal regex " <> pat
+    Right r ->
+      matchRegex r
+  where
+    -- ensure the pattern only matches the current position in the parse
+    pattern =
+      case stripPrefix (Pattern "^") pat of
+        Nothing ->
+          "^" <> pat
+        _ ->
+          pat
+    matchRegex :: Regex.Regex -> Parser String
+    matchRegex r =
+      Parser \{ str, pos } ->
+        let
+          remainder = drop pos str
+        in
+          case uncons $ fromMaybe [] $ Regex.match r remainder of
+            Just { head: Just matched, tail: _ }  ->
+              Right { result: matched, suffix: { str, pos: pos + length matched } }
+            _ ->
+              Left { pos, error: ParseError "no match" }

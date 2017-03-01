@@ -15,7 +15,7 @@ import Test.Assert (assert', ASSERT, assert)
 import Text.Parsing.StringParser (Parser, runParser, try)
 import Text.Parsing.StringParser.Combinators (many1, endBy1, sepBy1, optionMaybe, many, chainl, fix, between)
 import Text.Parsing.StringParser.Expr (Assoc(..), Operator(..), buildExprParser)
-import Text.Parsing.StringParser.String (anyDigit, eof, string, anyChar)
+import Text.Parsing.StringParser.String (anyDigit, eof, string, anyChar, regex)
 
 parens :: forall a. Parser a -> Parser a
 parens = between (string "(") (string ")")
@@ -48,6 +48,7 @@ exprTest = buildExprParser [ [Infix (string "/" >>= \_ -> pure div) AssocRight]
                            ] digit
 
 tryTest :: Parser String
+            -- reduce the possible array of matches to 0 or 1 elements to aid Array pattern matching
 tryTest = try ((<>) <$> string "aa" <*> string "bb") <|>
           (<>) <$> string "aa" <*> string "cc"
 
@@ -84,3 +85,4 @@ main = do
   assert' "tryTest "$ canParse tryTest "aacc"
   assert $ expectResult ('0':'1':'2':'3':'4':Nil) (many1 anyDigit) "01234/"
   assert $ expectResult ('5':'6':'7':'8':'9':Nil) (many1 anyDigit) "56789:"
+  assert $ expectResult "aaaa" (regex "a+") "aaaab"
