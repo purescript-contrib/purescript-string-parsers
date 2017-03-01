@@ -141,4 +141,4 @@ regex pat =
             Just { head: Just matched, tail: _ }  ->
               Right { result: matched, suffix: { str, pos: pos + length matched } }
             _ ->
-              Left { pos, error: ParseError $ "no match" }
+              Left { pos, error: ParseError "no match" }
