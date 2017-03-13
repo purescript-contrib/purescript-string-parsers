@@ -23,6 +23,7 @@ module Text.Parsing.StringParser.Combinators
   , chainr1'
   , choice
   , manyTill
+  , many1Till
   , module Control.Lazy
   ) where
 
@@ -149,3 +150,10 @@ manyTill p end = scan
   scan = (end *> pure Nil) <|> do x <- p
                                   xs <- scan
                                   pure (Cons x xs)
+
+-- | Parse several phrases until the specified terminator matches, requiring at least one match.
+many1Till :: forall a end. Parser a -> Parser end -> Parser (List a)
+many1Till p end = do
+  x <- p
+  xs <- manyTill p end
+  pure (Cons x xs)
