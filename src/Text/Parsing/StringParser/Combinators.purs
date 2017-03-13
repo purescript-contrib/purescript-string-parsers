@@ -23,6 +23,7 @@ module Text.Parsing.StringParser.Combinators
   , chainr1'
   , choice
   , manyTill
+  , many1Till
   , module Control.Lazy
   ) where
 
@@ -144,8 +145,11 @@ choice = foldl (<|>) (fail "Nothing to parse")
 
 -- | Parse values until a terminator.
 manyTill :: forall a end. Parser a -> Parser end -> Parser (List a)
-manyTill p end = scan
-  where
-  scan = (end *> pure Nil) <|> do x <- p
-                                  xs <- scan
-                                  pure (Cons x xs)
+manyTill p end = (end *> pure Nil) <|> many1Till p end
+
+-- | Parse values until the terminator matches, requiring at least one match.
+many1Till :: forall a end. Parser a -> Parser end -> Parser (List a)
+many1Till p end = do
+  x <- p
+  xs <- manyTill p end
+  pure (Cons x xs)

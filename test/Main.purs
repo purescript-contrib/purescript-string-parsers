@@ -13,7 +13,7 @@ import Data.Unfoldable (replicate)
 
 import Test.Assert (assert', ASSERT, assert)
 import Text.Parsing.StringParser (Parser, runParser, try)
-import Text.Parsing.StringParser.Combinators (many1, endBy1, sepBy1, optionMaybe, many, chainl, fix, between)
+import Text.Parsing.StringParser.Combinators (many1, endBy1, sepBy1, optionMaybe, many, manyTill, many1Till, chainl, fix, between)
 import Text.Parsing.StringParser.Expr (Assoc(..), Operator(..), buildExprParser)
 import Text.Parsing.StringParser.String (anyDigit, eof, string, anyChar, regex)
 
@@ -86,3 +86,7 @@ main = do
   assert $ expectResult ('0':'1':'2':'3':'4':Nil) (many1 anyDigit) "01234/"
   assert $ expectResult ('5':'6':'7':'8':'9':Nil) (many1 anyDigit) "56789:"
   assert $ expectResult "aaaa" (regex "a+") "aaaab"
+  assert $ expectResult ("a":"a":"a":Nil)  (manyTill (string "a") (string "b")) "aaab"
+  assert $ expectResult Nil (manyTill (string "a") (string "b")) "b"
+  assert $ expectResult ("a":"a":"a":Nil)  (many1Till (string "a") (string "b")) "aaab"
+  assert $ parseFail (many1Till (string "a") (string "b")) "b"
