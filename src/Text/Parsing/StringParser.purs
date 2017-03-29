@@ -29,8 +29,9 @@ data ParseError = ParseError String
 instance showParseError :: Show ParseError where
   show (ParseError msg) = msg
 
-instance eqParseError :: Eq ParseError where
-  eq (ParseError x) (ParseError y) = x == y
+derive instance eqParseError :: Eq ParseError
+
+derive instance ordParseError :: Ord ParseError
 
 -- | A parser is represented as a function which takes a pair of
 -- | continuations for failure and success.

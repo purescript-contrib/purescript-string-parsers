@@ -22,7 +22,7 @@ parens = between (string "(") (string ")")
 
 nested :: Parser Int
 nested = fix $ \p -> (do
-  string "a"
+  _ <- string "a"
   pure 0) <|> ((+) 1) <$> parens p
 
 opTest :: Parser String
@@ -73,7 +73,7 @@ main = do
   assert $ expectResult ("a":"a":"a":Nil)  (many (string "a")) "aaa"
   assert $ parseFail (many1 (string "a")) ""
   assert $ canParse (parens (do
-    string "a"
+    _ <- string "a"
     optionMaybe $ string "b")) "(ab)"
   assert $ expectResult ("a":"a":"a":Nil) (string "a" `sepBy1` string ",") "a,a,a"
   assert $ canParse (do

@@ -84,11 +84,11 @@ skipSpaces :: Parser Unit
 skipSpaces = void whiteSpace
 
 -- | Match one of the characters in the foldable structure.
-oneOf :: forall f. (Foldable f) => f Char -> Parser Char
+oneOf :: forall f. Foldable f => f Char -> Parser Char
 oneOf = satisfy <<< flip elem
 
 -- | Match any character not in the foldable structure.
-noneOf :: forall f. (Foldable f) => f Char -> Parser Char
+noneOf :: forall f. Foldable f => f Char -> Parser Char
 noneOf = satisfy <<< flip notElem
 
 -- | Match any lower case character.

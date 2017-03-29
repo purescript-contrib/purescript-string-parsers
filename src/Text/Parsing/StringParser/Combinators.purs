@@ -140,7 +140,7 @@ chainr1' p f a = (do f' <- f
                      pure $ f' a a') <|> pure a
 
 -- | Parse using any of a collection of parsers.
-choice :: forall f a. (Foldable f) => f (Parser a) -> Parser a
+choice :: forall f a. Foldable f => f (Parser a) -> Parser a
 choice = foldl (<|>) (fail "Nothing to parse")
 
 -- | Parse values until a terminator.
