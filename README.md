@@ -11,7 +11,7 @@ This library is a simpler, faster alternative to `purescript-parsing`, for when 
 
 ## Installing
 
-    bower i purescript-string-parsers
+    bower i purescript-string-parsers --save
 
 ## Documentation
 
