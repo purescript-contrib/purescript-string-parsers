@@ -31,10 +31,11 @@ import Prelude
 
 import Control.Alt ((<|>))
 import Control.Lazy (fix)
+import Control.Monad.Rec.Class (Step(..), tailRecM)
 
 import Data.Either (Either(..))
 import Data.Foldable (class Foldable, foldl)
-import Data.List (List(..), singleton, manyRec)
+import Data.List (List(..), singleton, manyRec, reverse)
 import Data.Maybe (Maybe(..))
 
 import Text.Parsing.StringParser (Parser(..), fail)
@@ -151,5 +152,12 @@ manyTill p end = (end *> pure Nil) <|> many1Till p end
 many1Till :: forall a end. Parser a -> Parser end -> Parser (List a)
 many1Till p end = do
   x <- p
-  xs <- manyTill p end
-  pure (Cons x xs)
+  tailRecM inner (pure x)
+  where
+    ending acc = do
+      _ <- end
+      pure $ Done (reverse acc)
+    continue acc = do
+      c <- p
+      pure $ Loop (Cons c acc)
+    inner acc = ending acc <|> continue acc

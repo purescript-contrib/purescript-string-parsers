@@ -7,7 +7,9 @@ import Control.Monad.Eff (Eff)
 import Control.Monad.Eff.Console (CONSOLE)
 
 import Data.Either (isLeft, isRight, Either(..))
+import Data.Foldable (fold)
 import Data.List (List(Nil), (:))
+import Data.List.Lazy (take, repeat)
 import Data.String (joinWith, singleton)
 import Data.Unfoldable (replicate)
 
@@ -90,3 +92,7 @@ main = do
   assert $ expectResult Nil (manyTill (string "a") (string "b")) "b"
   assert $ expectResult ("a":"a":"a":Nil)  (many1Till (string "a") (string "b")) "aaab"
   assert $ parseFail (many1Till (string "a") (string "b")) "b"
+  -- check against overflow
+  assert $ canParse (many1Till (string "a") (string "and")) $ (fold <<< take 10000 $ repeat "a") <> "and"
+  -- check correct order
+  assert $ expectResult ('a':'b':'c':Nil)  (many1Till anyChar (string "d")) "abcd"
