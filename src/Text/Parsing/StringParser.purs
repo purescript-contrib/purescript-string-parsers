@@ -10,7 +10,7 @@ import Control.Lazy (class Lazy)
 import Data.Bifunctor (bimap, lmap)
 import Data.Either (Either(..))
 
--- | A poition in an input string.
+-- | A position in an input string.
 type Pos = Int
 
 -- | Strings are represented as a string with an index from the
