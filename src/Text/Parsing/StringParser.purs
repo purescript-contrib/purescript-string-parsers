@@ -3,6 +3,8 @@
 module Text.Parsing.StringParser where
 
 import Prelude
+
+import Control.Apply (lift2)
 import Control.MonadPlus (class MonadPlus, class MonadZero, class Alternative)
 import Control.Monad.Rec.Class (class MonadRec, tailRecM, Step(..))
 import Control.Plus (class Plus, class Alt)
@@ -98,3 +100,6 @@ fail msg = Parser \{ pos } -> Left { pos, error: ParseError msg }
 -- | `try p` backtracks even if input was consumed.
 try :: forall a. Parser a -> Parser a
 try (Parser p) = Parser \(s@{ pos }) -> lmap (_ { pos = pos}) (p s)
+
+instance semigroupParser :: Semigroup a => Semigroup (Parser a) where
+  append = lift2 append
