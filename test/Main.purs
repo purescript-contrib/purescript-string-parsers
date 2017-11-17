@@ -51,8 +51,9 @@ exprTest = buildExprParser [ [Infix (string "/" >>= \_ -> pure div) AssocRight]
 
 tryTest :: Parser String
             -- reduce the possible array of matches to 0 or 1 elements to aid Array pattern matching
-tryTest = try ((<>) <$> string "aa" <*> string "bb") <|>
-          (<>) <$> string "aa" <*> string "cc"
+tryTest = 
+  try ((string "aa" <> string "bb")) <|> 
+       (string "aa" <> string "cc")
 
 canParse :: forall a. Parser a -> String -> Boolean
 canParse p input = isRight $ runParser p input
