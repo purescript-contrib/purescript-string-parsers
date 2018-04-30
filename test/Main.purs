@@ -3,8 +3,7 @@ module Test.Main where
 import Prelude hiding (between)
 
 import Control.Alt ((<|>))
-import Control.Monad.Eff (Eff)
-import Control.Monad.Eff.Console (CONSOLE)
+import Effect (Effect)
 
 import Data.Either (isLeft, isRight, Either(..))
 import Data.Foldable (fold)
@@ -13,7 +12,7 @@ import Data.List.Lazy (take, repeat)
 import Data.String (joinWith, singleton)
 import Data.Unfoldable (replicate)
 
-import Test.Assert (assert', ASSERT, assert)
+import Test.Assert (assert', assert)
 import Text.Parsing.StringParser (Parser, runParser, try)
 import Text.Parsing.StringParser.Combinators (many1, endBy1, sepBy1, optionMaybe, many, manyTill, many1Till, chainl, fix, between)
 import Text.Parsing.StringParser.Expr (Assoc(..), Operator(..), buildExprParser)
@@ -64,7 +63,7 @@ parseFail p input = isLeft $ runParser p input
 expectResult :: forall a. (Eq a) => a -> Parser a -> String -> Boolean
 expectResult res p input = runParser p input == Right res
 
-main :: forall e. Eff (console :: CONSOLE, assert :: ASSERT | e) Unit
+main :: Effect Unit
 main = do
   assert' "many should not blow the stack" $ canParse (many (string "a")) (joinWith "" $ replicate 100000 "a")
   assert' "many failing after" $ parseFail (do
