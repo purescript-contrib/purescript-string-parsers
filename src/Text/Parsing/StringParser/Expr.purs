@@ -46,8 +46,8 @@ buildExprParser operators simpleExpr =
         prefixOp  = choice accum.prefix <?> ""
         postfixOp = choice accum.postfix <?> ""
 
-        postfixP = postfixOp <|> pure id
-        prefixP  = prefixOp <|> pure id
+        postfixP = postfixOp <|> pure identity
+        prefixP  = prefixOp <|> pure identity
       in do
         x <- termP prefixP term postfixP
         rassocP x rassocOp prefixP term postfixP
