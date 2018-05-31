@@ -7,6 +7,8 @@ import Data.Either (isLeft, isRight, Either(..))
 import Data.Foldable (fold)
 import Data.List (List(Nil), (:))
 import Data.List.Lazy (take, repeat)
+import Data.List.NonEmpty (NonEmptyList(..))
+import Data.NonEmpty ((:|))
 import Data.String (joinWith)
 import Data.String.CodeUnits (singleton)
 import Data.Unfoldable (replicate)
@@ -84,14 +86,14 @@ main = do
   assert' "opTest" $ expectResult "abc" opTest "a+b+c"
   assert' "exprTest" $ expectResult (-3) exprTest "1*2+3/4-5"
   assert' "tryTest "$ canParse tryTest "aacc"
-  assert $ expectResult ('0':'1':'2':'3':'4':Nil) (many1 anyDigit) "01234/"
-  assert $ expectResult ('5':'6':'7':'8':'9':Nil) (many1 anyDigit) "56789:"
+  assert $ expectResult (NonEmptyList ('0' :| '1':'2':'3':'4':Nil)) (many1 anyDigit) "01234/"
+  assert $ expectResult (NonEmptyList ('5' :| '6':'7':'8':'9':Nil)) (many1 anyDigit) "56789:"
   assert $ expectResult "aaaa" (regex "a+") "aaaab"
   assert $ expectResult ("a":"a":"a":Nil)  (manyTill (string "a") (string "b")) "aaab"
   assert $ expectResult Nil (manyTill (string "a") (string "b")) "b"
-  assert $ expectResult ("a":"a":"a":Nil)  (many1Till (string "a") (string "b")) "aaab"
+  assert $ expectResult (NonEmptyList ("a" :| "a":"a":Nil)) (many1Till (string "a") (string "b")) "aaab"
   assert $ parseFail (many1Till (string "a") (string "b")) "b"
   -- check against overflow
   assert $ canParse (many1Till (string "a") (string "and")) $ (fold <<< take 10000 $ repeat "a") <> "and"
   -- check correct order
-  assert $ expectResult ('a':'b':'c':Nil)  (many1Till anyChar (string "d")) "abcd"
+  assert $ expectResult (NonEmptyList ('a' :| 'b':'c':Nil)) (many1Till anyChar (string "d")) "abcd"

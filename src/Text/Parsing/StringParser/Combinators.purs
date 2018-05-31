@@ -32,12 +32,13 @@ import Prelude
 import Control.Alt ((<|>))
 import Control.Lazy (fix)
 import Control.Monad.Rec.Class (Step(..), tailRecM)
-
 import Data.Either (Either(..))
 import Data.Foldable (class Foldable, foldl)
-import Data.List (List(..), singleton, manyRec, reverse)
+import Data.List (List(..), manyRec)
+import Data.List.NonEmpty (NonEmptyList(..))
+import Data.List.NonEmpty as NEL
 import Data.Maybe (Maybe(..))
-
+import Data.NonEmpty ((:|))
 import Text.Parsing.StringParser (Parser(..), fail)
 
 -- | Read ahead without consuming input.
@@ -52,8 +53,8 @@ many :: forall a. Parser a -> Parser (List a)
 many = manyRec
 
 -- | Match one or more times.
-many1 :: forall a. Parser a -> Parser (List a)
-many1 p = Cons <$> p <*> many p
+many1 :: forall a. Parser a -> Parser (NonEmptyList a)
+many1 p = cons' <$> p <*> many p
 
 -- | Provide an error message in case of failure.
 withError :: forall a. Parser a -> String -> Parser a
@@ -90,18 +91,18 @@ sepBy1 p sep = do
 
 -- | Parse zero or more separated values, optionally ending with a separator.
 sepEndBy :: forall a sep. Parser a -> Parser sep -> Parser (List a)
-sepEndBy p sep = sepEndBy1 p sep <|> pure Nil
+sepEndBy p sep = map NEL.toList (sepEndBy1 p sep) <|> pure Nil
 
 -- | Parse one or more separated values, optionally ending with a separator.
-sepEndBy1 :: forall a sep. Parser a -> Parser sep -> Parser (List a)
+sepEndBy1 :: forall a sep. Parser a -> Parser sep -> Parser (NonEmptyList a)
 sepEndBy1 p sep = do
   a <- p
   (do _ <- sep
       as <- sepEndBy p sep
-      pure (Cons a as)) <|> pure (singleton a)
+      pure (cons' a as)) <|> pure (NEL.singleton a)
 
 -- | Parse zero or more separated values, ending with a separator.
-endBy1 :: forall a sep. Parser a -> Parser sep -> Parser (List a)
+endBy1 :: forall a sep. Parser a -> Parser sep -> Parser (NonEmptyList a)
 endBy1 p sep = many1 $ p <* sep
 
 -- | Parse one or more separated values, ending with a separator.
@@ -146,18 +147,21 @@ choice = foldl (<|>) (fail "Nothing to parse")
 
 -- | Parse values until a terminator.
 manyTill :: forall a end. Parser a -> Parser end -> Parser (List a)
-manyTill p end = (end *> pure Nil) <|> many1Till p end
+manyTill p end = (end *> pure Nil) <|> map NEL.toList (many1Till p end)
 
 -- | Parse values until the terminator matches, requiring at least one match.
-many1Till :: forall a end. Parser a -> Parser end -> Parser (List a)
+many1Till :: forall a end. Parser a -> Parser end -> Parser (NonEmptyList a)
 many1Till p end = do
   x <- p
   tailRecM inner (pure x)
   where
     ending acc = do
       _ <- end
-      pure $ Done (reverse acc)
+      pure $ Done (NEL.reverse acc)
     continue acc = do
       c <- p
-      pure $ Loop (Cons c acc)
+      pure $ Loop (NEL.cons c acc)
     inner acc = ending acc <|> continue acc
+
+cons' :: forall a. a -> List a -> NonEmptyList a
+cons' h t = NonEmptyList (h :| t)
