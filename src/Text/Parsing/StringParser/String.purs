@@ -21,12 +21,14 @@ module Text.Parsing.StringParser.String
 import Prelude
 
 import Control.Alt ((<|>))
-import Data.Array ((..), uncons)
+import Data.Array ((..))
+import Data.Array.NonEmpty as NEA
 import Data.Char (toCharCode)
 import Data.Either (Either(..))
 import Data.Foldable (class Foldable, foldMap, elem, notElem)
-import Data.Maybe (Maybe(..), fromMaybe)
-import Data.String (Pattern(..), charAt, drop, length, indexOf', singleton, stripPrefix)
+import Data.Maybe (Maybe(..))
+import Data.String (Pattern(..), drop, length, indexOf', stripPrefix)
+import Data.String.CodeUnits (charAt, singleton)
 import Data.String.Regex as Regex
 import Data.String.Regex.Flags (noFlags)
 import Text.Parsing.StringParser (Parser(..), ParseError(..), try, fail)
@@ -137,8 +139,8 @@ regex pat =
         let
           remainder = drop pos str
         in
-          case uncons $ fromMaybe [] $ Regex.match r remainder of
-            Just { head: Just matched, tail: _ }  ->
+          case NEA.head <$> Regex.match r remainder of
+            Just (Just matched)  ->
               Right { result: matched, suffix: { str, pos: pos + length matched } }
             _ ->
               Left { pos, error: ParseError "no match" }
