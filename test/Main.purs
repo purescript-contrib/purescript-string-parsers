@@ -3,15 +3,14 @@ module Test.Main where
 import Prelude hiding (between)
 
 import Control.Alt ((<|>))
-import Effect (Effect)
-
 import Data.Either (isLeft, isRight, Either(..))
 import Data.Foldable (fold)
 import Data.List (List(Nil), (:))
 import Data.List.Lazy (take, repeat)
-import Data.String (joinWith, singleton)
+import Data.String (joinWith)
+import Data.String.CodeUnits (singleton)
 import Data.Unfoldable (replicate)
-
+import Effect (Effect)
 import Test.Assert (assert', assert)
 import Text.Parsing.StringParser (Parser, runParser, try)
 import Text.Parsing.StringParser.Combinators (many1, endBy1, sepBy1, optionMaybe, many, manyTill, many1Till, chainl, fix, between)
@@ -50,8 +49,8 @@ exprTest = buildExprParser [ [Infix (string "/" >>= \_ -> pure div) AssocRight]
 
 tryTest :: Parser String
             -- reduce the possible array of matches to 0 or 1 elements to aid Array pattern matching
-tryTest = 
-  try (string "aa" <> string "bb") <|> 
+tryTest =
+  try (string "aa" <> string "bb") <|>
       (string "aa" <> string "cc")
 
 canParse :: forall a. Parser a -> String -> Boolean
