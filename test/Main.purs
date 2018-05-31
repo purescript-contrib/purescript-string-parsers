@@ -78,7 +78,7 @@ main = do
   assert $ canParse (parens (do
     _ <- string "a"
     optionMaybe $ string "b")) "(ab)"
-  assert $ expectResult ("a":"a":"a":Nil) (string "a" `sepBy1` string ",") "a,a,a"
+  assert $ expectResult (NonEmptyList ("a" :| "a":"a":Nil)) (string "a" `sepBy1` string ",") "a,a,a"
   assert $ canParse (do
     as <- string "a" `endBy1` string ","
     eof

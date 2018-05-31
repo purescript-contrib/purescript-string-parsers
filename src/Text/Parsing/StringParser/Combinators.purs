@@ -80,14 +80,14 @@ optionMaybe p = option Nothing (Just <$> p)
 
 -- | Parse zero or more separated values.
 sepBy :: forall a sep. Parser a -> Parser sep -> Parser (List a)
-sepBy p sep = sepBy1 p sep <|> pure Nil
+sepBy p sep = map NEL.toList (sepBy1 p sep) <|> pure Nil
 
 -- | Parse one or more separated values.
-sepBy1 :: forall a sep. Parser a -> Parser sep -> Parser (List a)
+sepBy1 :: forall a sep. Parser a -> Parser sep -> Parser (NonEmptyList a)
 sepBy1 p sep = do
   a <- p
   as <- many $ sep *> p
-  pure (Cons a as)
+  pure (cons' a as)
 
 -- | Parse zero or more separated values, optionally ending with a separator.
 sepEndBy :: forall a sep. Parser a -> Parser sep -> Parser (List a)
@@ -101,11 +101,11 @@ sepEndBy1 p sep = do
       as <- sepEndBy p sep
       pure (cons' a as)) <|> pure (NEL.singleton a)
 
--- | Parse zero or more separated values, ending with a separator.
+-- | Parse one or more separated values, ending with a separator.
 endBy1 :: forall a sep. Parser a -> Parser sep -> Parser (NonEmptyList a)
 endBy1 p sep = many1 $ p <* sep
 
--- | Parse one or more separated values, ending with a separator.
+-- | Parse zero or more separated values, ending with a separator.
 endBy :: forall a sep. Parser a -> Parser sep -> Parser (List a)
 endBy p sep = many $ p <* sep
 
