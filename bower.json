@@ -19,13 +19,15 @@
     "url": "git://github.com/paf31/purescript-string-parsers.git"
   },
   "dependencies": {
-    "purescript-control": "^4.0.0",
     "purescript-arrays": "^5.0.0",
-    "purescript-maybe": "^4.0.0",
-    "purescript-strings": "^4.0.0",
-    "purescript-foldable-traversable": "^4.0.0",
+    "purescript-bifunctors": "^4.0.0",
+    "purescript-control": "^4.0.0",
     "purescript-either": "^4.0.0",
+    "purescript-foldable-traversable": "^4.0.0",
     "purescript-lists": "^5.0.0",
+    "purescript-maybe": "^4.0.0",
+    "purescript-prelude": "^4.0.0",
+    "purescript-strings": "^4.0.0",
     "purescript-tailrec": "^4.0.0"
   },
   "devDependencies": {
