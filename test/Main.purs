@@ -9,8 +9,8 @@ import Data.List (List(Nil), (:))
 import Data.List.Lazy (take, repeat)
 import Data.List.NonEmpty (NonEmptyList(..))
 import Data.NonEmpty ((:|))
-import Data.String (joinWith)
 import Data.String.CodeUnits (singleton)
+import Data.String.Common as SC
 import Data.Unfoldable (replicate)
 import Effect (Effect)
 import Test.Assert (assert', assert)
@@ -66,11 +66,11 @@ expectResult res p input = runParser p input == Right res
 
 main :: Effect Unit
 main = do
-  assert' "many should not blow the stack" $ canParse (many (string "a")) (joinWith "" $ replicate 100000 "a")
+  assert' "many should not blow the stack" $ canParse (many (string "a")) (SC.joinWith "" $ replicate 100000 "a")
   assert' "many failing after" $ parseFail (do
     as <- many (string "a")
     eof
-    pure as) (joinWith "" (replicate 100000 "a") <> "b" )
+    pure as) (SC.joinWith "" (replicate 100000 "a") <> "b" )
 
   assert $ expectResult 3 nested "(((a)))"
   assert $ expectResult ("a":"a":"a":Nil)  (many (string "a")) "aaa"

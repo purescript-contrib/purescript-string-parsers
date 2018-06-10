@@ -27,8 +27,9 @@ import Data.Char (toCharCode)
 import Data.Either (Either(..))
 import Data.Foldable (class Foldable, foldMap, elem, notElem)
 import Data.Maybe (Maybe(..))
-import Data.String (Pattern(..), drop, length, indexOf', stripPrefix)
 import Data.String.CodeUnits (charAt, singleton)
+import Data.String.CodeUnits as SCU
+import Data.String.Pattern (Pattern(..))
 import Data.String.Regex as Regex
 import Data.String.Regex.Flags (noFlags)
 import Text.Parsing.StringParser (Parser(..), ParseError(..), try, fail)
@@ -38,7 +39,7 @@ import Text.Parsing.StringParser.Combinators (many, (<?>))
 eof :: Parser Unit
 eof = Parser \s ->
   case s of
-    { str, pos } | pos < length str -> Left { pos, error: ParseError "Expected EOF" }
+    { str, pos } | pos < SCU.length str -> Left { pos, error: ParseError "Expected EOF" }
     _ -> Right { result: unit, suffix: s }
 
 -- | Match any character.
@@ -60,7 +61,7 @@ anyDigit = try do
 string :: String -> Parser String
 string nt = Parser \s ->
   case s of
-    { str, pos } | indexOf' (Pattern nt) pos str == Just pos -> Right { result: nt, suffix: { str, pos: pos + length nt } }
+    { str, pos } | SCU.indexOf' (Pattern nt) pos str == Just pos -> Right { result: nt, suffix: { str, pos: pos + SCU.length nt } }
     { pos } -> Left { pos, error: ParseError ("Expected '" <> nt <> "'.") }
 
 -- | Match a character satisfying the given predicate.
@@ -128,7 +129,7 @@ regex pat =
   where
     -- ensure the pattern only matches the current position in the parse
     pattern =
-      case stripPrefix (Pattern "^") pat of
+      case SCU.stripPrefix (Pattern "^") pat of
         Nothing ->
           "^" <> pat
         _ ->
@@ -137,10 +138,10 @@ regex pat =
     matchRegex r =
       Parser \{ str, pos } ->
         let
-          remainder = drop pos str
+          remainder = SCU.drop pos str
         in
           case NEA.head <$> Regex.match r remainder of
             Just (Just matched)  ->
-              Right { result: matched, suffix: { str, pos: pos + length matched } }
+              Right { result: matched, suffix: { str, pos: pos + SCU.length matched } }
             _ ->
               Left { pos, error: ParseError "no match" }
