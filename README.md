@@ -6,7 +6,7 @@
 [![Maintainer: garyb](https://img.shields.io/badge/maintainer-garyb-lightgrey.svg)](http://github.com/garyb)
 [![Maintainer: thomashoneyman](https://img.shields.io/badge/maintainer-thomashoneyman-lightgrey.svg)](http://github.com/thomashoneyman)
 
-A parsing library for parsing strings.
+A parsing library for parsing strings using [Code Units](https://pursuit.purescript.org/packages/purescript-strings/docs/Data.String.CodeUnits) (JS Strings). Does not handle [Code Points](https://pursuit.purescript.org/packages/purescript-strings/docs/Data.String.CodePoints).
 
 This library is a simpler, faster alternative to `purescript-parsing`, for when you know your input will be a string.
 
