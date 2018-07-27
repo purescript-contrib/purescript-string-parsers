@@ -1,6 +1,9 @@
--- | Primitive parsers for strings.
-
-module Text.Parsing.StringParser.String
+-- | Primitive parsers for strings, parsing based on code points.
+-- |
+-- | These functions will be much slower than the `CodeUnits` alternatives, but
+-- | will behave correctly in the presence of Unicode characters made up of
+-- | multiple code units.
+module Text.Parsing.StringParser.CodePoints
   ( eof
   , anyChar
   , anyDigit
@@ -27,8 +30,9 @@ import Data.Char (toCharCode)
 import Data.Either (Either(..))
 import Data.Foldable (class Foldable, foldMap, elem, notElem)
 import Data.Maybe (Maybe(..))
-import Data.String (Pattern(..), drop, length, indexOf', stripPrefix)
+import Data.String.CodePoints (drop, length, indexOf', stripPrefix)
 import Data.String.CodeUnits (charAt, singleton)
+import Data.String.Pattern (Pattern(..))
 import Data.String.Regex as Regex
 import Data.String.Regex.Flags (noFlags)
 import Text.Parsing.StringParser (Parser(..), ParseError(..), try, fail)
