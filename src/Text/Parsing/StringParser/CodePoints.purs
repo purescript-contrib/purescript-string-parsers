@@ -26,12 +26,13 @@ import Prelude
 import Control.Alt ((<|>))
 import Data.Array ((..))
 import Data.Array.NonEmpty as NEA
-import Data.Char (toCharCode)
+import Data.Char (fromCharCode, toCharCode)
 import Data.Either (Either(..))
+import Data.Enum (fromEnum)
 import Data.Foldable (class Foldable, foldMap, elem, notElem)
 import Data.Maybe (Maybe(..))
-import Data.String.CodePoints (drop, length, indexOf', stripPrefix)
-import Data.String.CodeUnits (charAt, singleton)
+import Data.String.CodePoints (codePointAt, drop, indexOf', length, stripPrefix)
+import Data.String.CodeUnits (singleton)
 import Data.String.Pattern (Pattern(..))
 import Data.String.Regex as Regex
 import Data.String.Regex.Flags (noFlags)
@@ -48,9 +49,13 @@ eof = Parser \s ->
 -- | Match any character.
 anyChar :: Parser Char
 anyChar = Parser \{ str, pos } ->
-  case charAt pos str of
-    Just chr -> Right { result: chr, suffix: { str, pos: pos + 1 } }
+  case codePointAt pos str of
+    Just cp -> case toChar cp of
+      Just chr -> Right { result: chr, suffix: { str, pos: pos + 1 } }
+      Nothing -> Left { pos, error: ParseError $ "CodePoint " <> show cp <> " is not a character" }
     Nothing -> Left { pos, error: ParseError "Unexpected EOF" }
+  where
+    toChar = fromCharCode <<< fromEnum
 
 -- | Match any digit.
 anyDigit :: Parser Char
