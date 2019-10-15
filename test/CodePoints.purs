@@ -17,7 +17,7 @@ import Test.Assert (assert', assert)
 import Text.Parsing.StringParser (Parser, runParser, try)
 import Text.Parsing.StringParser.Combinators (many1, endBy1, sepBy1, optionMaybe, many, manyTill, many1Till, chainl, fix, between)
 import Text.Parsing.StringParser.Expr (Assoc(..), Operator(..), buildExprParser)
-import Text.Parsing.StringParser.CodePoints (anyDigit, char, eof, string, anyChar, regex)
+import Text.Parsing.StringParser.CodePoints (anyDigit, eof, string, anyChar, regex)
 
 parens :: forall a. Parser a -> Parser a
 parens = between (string "(") (string ")")
@@ -97,6 +97,3 @@ testCodePoints = do
   assert $ canParse (many1Till (string "a") (string "and")) $ (fold <<< take 10000 $ repeat "a") <> "and"
   -- check correct order
   assert $ expectResult (NonEmptyList ('a' :| 'b':'c':Nil)) (many1Till anyChar (string "d")) "abcd"
-  assert $ expectResult "\x458CA" (string "\x458CA" <* char ']' <* eof ) "\x458CA]"
-  assert $ expectResult "\x458CA" (string "\x458CA" <* string ")" <* eof ) "\x458CA)"
-  assert $ expectResult '\xEEE2' (char '\xEEE2' <* eof ) "\xEEE2"
