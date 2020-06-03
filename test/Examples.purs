@@ -21,18 +21,18 @@ printResults = do
   log "" -- empty blank line to separate output from function call
 
   log "### Example Content 1 ###"
-  doBoth "fail" ((fail "example failure message") :: Parser Unit)
-  doBoth "numberOfAs" numberOfAs
-  doBoth "removePunctuation" removePunctuation
-  doBoth "replaceVowelsWithUnderscore" replaceVowelsWithUnderscore
-  doBoth "tokenizeContentBySpaceChars" tokenizeContentBySpaceChars
-  doBoth "extractWords" extractWords
-  doBoth "badExtractWords" badExtractWords
-  doBoth "quotedLetterExists" quotedLetterExists
+  doBoth "fail" ((fail "example failure message") :: Parser Unit) exampleContent1
+  doBoth "numberOfAs" numberOfAs exampleContent1
+  doBoth "removePunctuation" removePunctuation exampleContent1
+  doBoth "replaceVowelsWithUnderscore" replaceVowelsWithUnderscore exampleContent1
+  doBoth "tokenizeContentBySpaceChars" tokenizeContentBySpaceChars exampleContent1
+  doBoth "extractWords" extractWords exampleContent1
+  doBoth "badExtractWords" badExtractWords exampleContent1
+  doBoth "quotedLetterExists" quotedLetterExists exampleContent1
 
   log "\n\
        \### Example Content 2 ###"
-  doBoth "parseCSV" parseCSV
+  doBoth "parseCSV" parseCSV exampleContent2
 
 -- Example Content 1
 
@@ -118,7 +118,12 @@ badExtractWords = do
 -- the basic idea:
 quotedLetterExists :: Parser Boolean
 quotedLetterExists = do
-  list <- many (   true <$ (between (string "'") (string "'") (char 'a') <?> "No 'a' found.")
+  let
+    singleQuoteChar = string "'"
+    betweenSingleQuotes parser =
+      between singleQuoteChar singleQuoteChar parser
+
+  list <- many (   true <$ (betweenSingleQuotes (char 'a') <?> "No 'a' found.")
               <|> false <$ anyChar
                )
   pure $ foldl (||) false list
@@ -196,18 +201,18 @@ parseCSV = do
 
 -- Helper functions
 
-doBoth :: forall a. Show a => String -> Parser a -> Effect Unit
-doBoth parserName parser = do
-  doRunParser parserName parser
-  doUnParser parserName parser
+doBoth :: forall a. Show a => String -> Parser a -> String -> Effect Unit
+doBoth parserName parser content = do
+  doRunParser parserName parser content
+  doUnParser parserName parser content
 
 -- | Shows the results of calling `unParser`. You typically want to use
 -- | this function when writing a parser because it includes other info
 -- | to help you debug your code.
-doUnParser :: forall a. Show a => String -> Parser a -> Effect Unit
-doUnParser parserName parser = do
+doUnParser :: forall a. Show a => String -> Parser a -> String -> Effect Unit
+doUnParser parserName parser content = do
   log $ "(unParser) Parsing content with '" <> parserName <> "'"
-  case unParser parser { str: exampleContent1, pos: 0 } of
+  case unParser parser { str: content, pos: 0 } of
     Left rec -> log $ "Position: " <> show rec.pos <> "\n\
                       \Error: " <> show rec.error
     Right rec -> log $ "Result was: " <> show rec.result <> "\n\
@@ -218,10 +223,10 @@ doUnParser parserName parser = do
 -- | Shows the results of calling `runParser`. You typically don't want to use
 -- | this function when writing a parser because it doesn't help you debug
 -- | your code when you write it incorrectly.
-doRunParser :: forall a. Show a => String -> Parser a -> Effect Unit
-doRunParser parserName parser = do
+doRunParser :: forall a. Show a => String -> Parser a -> String -> Effect Unit
+doRunParser parserName parser content = do
   log $ "(runParser) Parsing content with '" <> parserName <> "'"
-  case runParser parser exampleContent1 of
+  case runParser parser content of
     Left error -> logShow error
     Right result -> log $ "Result was: " <> show result
   log "-----"
