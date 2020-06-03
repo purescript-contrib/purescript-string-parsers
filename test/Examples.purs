@@ -4,12 +4,12 @@ import Prelude hiding (between)
 
 import Control.Alt ((<|>))
 import Data.Either (Either(..))
-import Data.Foldable (foldl, sum)
+import Data.Foldable (fold, foldl, sum)
 import Data.List.Types (NonEmptyList)
 import Effect (Effect)
 import Effect.Console (log, logShow)
-import Text.Parsing.StringParser (Parser, fail, runParser, unParser)
-import Text.Parsing.StringParser.CodePoints (char, eof, regex, string, anyChar)
+import Text.Parsing.StringParser (Parser, fail, runParser, try, unParser)
+import Text.Parsing.StringParser.CodePoints (anyChar, char, eof, regex, skipSpaces, string)
 import Text.Parsing.StringParser.Combinators (between, endBy1, many, many1, sepBy1, (<?>))
 
 -- Serves only to make this file runnable
@@ -29,6 +29,12 @@ printResults = do
   doBoth "extractWords" extractWords
   doBoth "badExtractWords" badExtractWords
   doBoth "quotedLetterExists" quotedLetterExists
+
+  log "\n\
+       \### Example Content 2 ###"
+  doBoth "parseCSV" parseCSV
+
+-- Example Content 1
 
 exampleContent1 :: String
 exampleContent1 =
@@ -116,6 +122,77 @@ quotedLetterExists = do
               <|> false <$ anyChar
                )
   pure $ foldl (||) false list
+
+-- Example Content 2
+
+-- CSV sample with some inconsistent spacing
+exampleContent2 :: String
+exampleContent2 =
+  "ID, FirstName, LastName,             Age, Email\n\
+  \523,     Mark,   Kenderson, 24, my.name.is.mark@mark.mark.com\n"
+
+type CsvContent =
+  { idNumber :: String
+  , firstName :: String
+  , lastName :: String
+  , age :: String
+  , originalEmail :: String
+  , modifiedEmail :: String
+  }
+
+parseCSV :: Parser CsvContent
+parseCSV = do
+  let
+    commaThenSpaces = string "," *> skipSpaces
+    idNumber_ = string "ID"
+    firstName_ = string "FirstName"
+    lastName_ = string "LastName"
+    age_ = string "Age"
+    email_ = string "Email"
+    newline = string "\n"
+    csvColumn = regex "[^,]+"
+
+  -- parse headers but don't produce output
+  void $ idNumber_ *> commaThenSpaces *>
+         firstName_ *> commaThenSpaces *>
+         lastName_ *> commaThenSpaces *>
+         age_ *> commaThenSpaces *>
+         email_
+
+  void newline
+
+  -- now we're on line 2
+  idNumber <- csvColumn <* commaThenSpaces
+  firstName <- csvColumn <* commaThenSpaces
+  lastName <- csvColumn <* commaThenSpaces
+  age <- csvColumn <* commaThenSpaces
+
+  -- try will parse the content ahead of us.
+  -- Even if it succeeds, the position of the string
+  -- will be reset to what it was before it.
+  originalEmail <- try $ regex "[^\n]+"
+
+  let
+    parseAlphanumericChars = regex "[a-zA-Z0-9]+"
+    parsePeriodsAndPlusesAsEmptyStrings =
+      "" <$ ((string ".") <|> (string "+"))
+    parseListOfParts =
+      many1  (  parseAlphanumericChars
+            <|> parsePeriodsAndPlusesAsEmptyStrings
+             )
+
+  usernameWithoutPeriodsOrPluses <- fold <$> parseListOfParts
+  void $ string "@"
+  domainName <- fold <$> (many1 ((regex "[a-zA-Z0-9]+") <|> (string ".")))
+  void $ string "\n"
+
+  -- Ensure we hit the end of the string content via 'end-of-file'
+  void eof
+
+  -- now return the parsed content
+  pure { idNumber, firstName, lastName, age, originalEmail
+       , modifiedEmail: usernameWithoutPeriodsOrPluses <> "@" <> domainName
+       }
 
 -- Helper functions
 
