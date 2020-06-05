@@ -8,9 +8,9 @@ import Data.Foldable (fold, foldl, sum)
 import Data.List.Types (NonEmptyList)
 import Effect (Effect)
 import Effect.Console (log, logShow)
-import Text.Parsing.StringParser (Parser, fail, runParser, try, unParser)
+import Text.Parsing.StringParser (Parser, fail, runParser, unParser)
 import Text.Parsing.StringParser.CodePoints (anyChar, char, eof, regex, skipSpaces, string)
-import Text.Parsing.StringParser.Combinators (between, endBy1, many, many1, sepBy1, (<?>))
+import Text.Parsing.StringParser.Combinators (between, endBy1, lookAhead, many, many1, sepBy1, (<?>))
 
 -- Serves only to make this file runnable
 main :: Effect Unit
@@ -172,10 +172,10 @@ parseCSV = do
   lastName <- csvColumn <* commaThenSpaces
   age <- csvColumn <* commaThenSpaces
 
-  -- try will parse the content ahead of us.
-  -- Even if it succeeds, the position of the string
-  -- will be reset to what it was before it.
-  originalEmail <- try $ regex "[^\n]+"
+  -- lookAhead will parse the content ahead of us,
+  -- then reset the position of the string
+  -- to what it was before it.
+  originalEmail <- lookAhead $ regex "[^\n]+"
 
   let
     parseAlphanumericChars = regex "[a-zA-Z0-9]+"
