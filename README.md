@@ -21,3 +21,7 @@ Module documentation is [published on Pursuit](http://pursuit.purescript.org/pac
 ## Contributing
 
 Read the [contribution guidelines](https://github.com/purescript-contrib/purescript-string-parsers/blob/master/.github/contributing.md) to get started and see helpful related resources.
+
+## Examples of Usage
+
+See [`test/Examples.purs`](./test/Examples.purs) for real-world examples.
