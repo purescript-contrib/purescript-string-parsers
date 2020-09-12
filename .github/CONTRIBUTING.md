@@ -1,4 +1,4 @@
-# Contributing to string-parsers
+# Contributing to String Parsers
 
 Thanks for your interest in contributing to `string-parsers`! We welcome new contributions regardless of your level of experience or familiarity with PureScript.
 

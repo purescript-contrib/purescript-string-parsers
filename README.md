@@ -1,4 +1,4 @@
-# string-parsers
+# String Parsers
 
 [![CI](https://github.com/purescript-contrib/purescript-string-parsers/workflows/CI/badge.svg?branch=main)](https://github.com/purescript-contrib/purescript-string-parsers/actions?query=workflow%3ACI+branch%3Amain)
 [![Release](http://img.shields.io/github/release/purescript-contrib/purescript-string-parsers.svg)](https://github.com/purescript-contrib/purescript-string-parsers/releases)
