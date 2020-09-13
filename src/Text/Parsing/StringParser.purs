@@ -103,3 +103,6 @@ try (Parser p) = Parser \(s@{ pos }) -> lmap (_ { pos = pos}) (p s)
 
 instance semigroupParser :: Semigroup a => Semigroup (Parser a) where
   append = lift2 append
+
+instance monoidParser :: Monoid a => Monoid (Parser a) where
+  mempty = pure mempty
