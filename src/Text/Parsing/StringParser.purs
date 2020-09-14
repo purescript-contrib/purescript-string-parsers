@@ -26,7 +26,7 @@ type Pos = Int
 type PosString = { str :: String, pos :: Pos }
 
 -- | The type of parsing errors.
-data ParseError = ParseError String
+newtype ParseError = ParseError String
 
 instance showParseError :: Show ParseError where
   show (ParseError msg) = msg
