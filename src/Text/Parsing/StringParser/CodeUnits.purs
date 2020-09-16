@@ -6,6 +6,7 @@
 module Text.Parsing.StringParser.CodeUnits
   ( eof
   , anyChar
+  , anyCodePoint
   , anyDigit
   , string
   , satisfy
@@ -30,6 +31,7 @@ import Data.Char (toCharCode)
 import Data.Either (Either(..))
 import Data.Foldable (class Foldable, foldMap, elem, notElem)
 import Data.Maybe (Maybe(..))
+import Data.String as SCP
 import Data.String.CodeUnits (charAt, singleton)
 import Data.String.CodeUnits as SCU
 import Data.String.Pattern (Pattern(..))
@@ -45,12 +47,21 @@ eof = Parser \s ->
     { str, pos } | pos < SCU.length str -> Left { pos, error: ParseError "Expected EOF" }
     _ -> Right { result: unit, suffix: s }
 
--- | Match any character.
+-- | Match any character. This is limited by `Char` to any code points
+-- | that are below `0xFFFF`. If you need to use higher code points
+-- | (e.g. emoji), see `anyCodePoint` and `string`.
 anyChar :: Parser Char
 anyChar = Parser \{ str, pos } ->
   case charAt pos str of
     Just chr -> Right { result: chr, suffix: { str, pos: pos + 1 } }
     Nothing -> Left { pos, error: ParseError "Unexpected EOF" }
+
+-- | Match any code point, including those above `0xFFFF`
+anyCodePoint :: Parser SCP.CodePoint
+anyCodePoint = Parser \rec@{ str, pos } ->
+   case SCP.codePointAt 0 (SCU.drop pos str) of
+     Just cp -> Right { result: cp, suffix: { str, pos: pos + SCU.length (SCP.singleton cp) } }
+     Nothing -> Left { pos, error: ParseError "Unexpected EOF" }
 
 -- | Match any digit.
 anyDigit :: Parser Char
