@@ -105,3 +105,13 @@ testCodeUnits = do
   assert $ expectResult "🍔" (anyChar *> anyCodePointStr <* anyChar) "a🍔a"
   assert $ expectResult ({a: "🍔", b: "🍺"}) ({a:_, b:_} <$> (anyCodePointStr <* void anyChar) <*> anyCodePointStr) "🍔a🍺"
   assert $ expectResult ({a: "a", b: "b", c:"c"}) ({a:_, b:_, c:_} <$> anyCodePointStr <*> anyCodePointStr <*> anyCodePointStr) "abc"
+  -- check string
+  assert $ expectResult "🍔🍺" (string "🍔🍺") "🍔🍺"
+  assert $ expectResult (NonEmptyList ("🍔🍺" :| "🍔🍺":"🍔🍺":Nil)) (many1 $ string "🍔🍺") "🍔🍺🍔🍺🍔🍺"
+  assert $ expectResult (NonEmptyList ("a🍔🍺":|"a🍔🍺":"a🍔🍺":Nil)) (many1 $ string "a🍔🍺") "a🍔🍺a🍔🍺a🍔🍺"
+  assert $ expectResult (NonEmptyList ("🍔a🍺":|"🍔a🍺":"🍔a🍺":Nil)) (many1 $ string "🍔a🍺") "🍔a🍺🍔a🍺🍔a🍺"
+  assert $ expectResult (NonEmptyList ("🍔🍺a" :| "🍔🍺a":"🍔🍺a":Nil)) (many1 $ string "🍔🍺a") "🍔🍺a🍔🍺a🍔🍺a"
+  assert $ expectResult (NonEmptyList ("a" :| "a":"a":Nil)) (many1 $ string "a") "aaa"
+  assert $ expectResult (NonEmptyList ("abc" :| "abc":"abc":Nil)) (many1 $ string "abc") "abcabcabc"
+  assert $ expectResult (NonEmptyList ("abc" :| "abc":"abc":Nil)) (many1 $ string "abc") "abcabcabc"
+  assert $ expectResult (NonEmptyList ("abc�def" :| Nil)) (many1 $ string "abc�def") "abc�def"
