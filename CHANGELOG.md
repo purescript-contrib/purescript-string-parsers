@@ -130,4 +130,3 @@ Release for compiler version 0.7.
 ## [v0.1.0](https://github.com/purescript-contrib/purescript-string-parsers/releases/tag/v0.1.0) - 2014-08-11
 
 Initial semver release.
-

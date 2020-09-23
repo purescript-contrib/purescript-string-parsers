@@ -26,7 +26,7 @@ type Pos = Int
 type PosString = { str :: String, pos :: Pos }
 
 -- | The type of parsing errors.
-data ParseError = ParseError String
+newtype ParseError = ParseError String
 
 instance showParseError :: Show ParseError where
   show (ParseError msg) = msg
@@ -103,3 +103,6 @@ try (Parser p) = Parser \(s@{ pos }) -> lmap (_ { pos = pos}) (p s)
 
 instance semigroupParser :: Semigroup a => Semigroup (Parser a) where
   append = lift2 append
+
+instance monoidParser :: Monoid a => Monoid (Parser a) where
+  mempty = pure mempty
