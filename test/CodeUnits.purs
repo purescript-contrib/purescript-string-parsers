@@ -115,3 +115,5 @@ testCodeUnits = do
   assert $ expectResult (NonEmptyList ("abc" :| "abc":"abc":Nil)) (many1 $ string "abc") "abcabcabc"
   assert $ expectResult (NonEmptyList ("abc" :| "abc":"abc":Nil)) (many1 $ string "abc") "abcabcabc"
   assert $ expectResult (NonEmptyList ("abc�def" :| Nil)) (many1 $ string "abc�def") "abc�def"
+
+  assert $ expectResult "🍔\xd83c" (string "🍔\xd83c") "🍔🍺"
