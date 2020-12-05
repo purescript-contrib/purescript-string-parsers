@@ -9,15 +9,16 @@ import Data.List (List(Nil), (:))
 import Data.List.Lazy (take, repeat)
 import Data.List.NonEmpty (NonEmptyList(..))
 import Data.NonEmpty ((:|))
+import Data.String.CodePoints as SCP
 import Data.String.CodeUnits (singleton)
 import Data.String.Common as SC
 import Data.Unfoldable (replicate)
 import Effect (Effect)
 import Test.Assert (assert', assert)
 import Text.Parsing.StringParser (Parser, runParser, try)
+import Text.Parsing.StringParser.CodeUnits (anyChar, anyCodePoint, anyDigit, eof, regex, string)
 import Text.Parsing.StringParser.Combinators (many1, endBy1, sepBy1, optionMaybe, many, manyTill, many1Till, chainl, fix, between)
 import Text.Parsing.StringParser.Expr (Assoc(..), Operator(..), buildExprParser)
-import Text.Parsing.StringParser.CodeUnits (anyDigit, eof, string, anyChar, regex)
 
 parens :: forall a. Parser a -> Parser a
 parens = between (string "(") (string ")")
@@ -97,3 +98,22 @@ testCodeUnits = do
   assert $ canParse (many1Till (string "a") (string "and")) $ (fold <<< take 10000 $ repeat "a") <> "and"
   -- check correct order
   assert $ expectResult (NonEmptyList ('a' :| 'b':'c':Nil)) (many1Till anyChar (string "d")) "abcd"
+  -- check anyCodePoint
+  let anyCodePointStr = map SCP.singleton anyCodePoint
+  let anyCharStr = map singleton anyChar
+  assert $ expectResult (NonEmptyList ("🍔" :| "🍺":Nil)) (many1 $ anyCodePointStr) "🍔🍺"
+  assert $ expectResult "🍔" (anyChar *> anyCodePointStr <* anyChar) "a🍔a"
+  assert $ expectResult ({a: "🍔", b: "🍺"}) ({a:_, b:_} <$> (anyCodePointStr <* void anyChar) <*> anyCodePointStr) "🍔a🍺"
+  assert $ expectResult ({a: "a", b: "b", c:"c"}) ({a:_, b:_, c:_} <$> anyCodePointStr <*> anyCodePointStr <*> anyCodePointStr) "abc"
+  -- check string
+  assert $ expectResult "🍔🍺" (string "🍔🍺") "🍔🍺"
+  assert $ expectResult (NonEmptyList ("🍔🍺" :| "🍔🍺":"🍔🍺":Nil)) (many1 $ string "🍔🍺") "🍔🍺🍔🍺🍔🍺"
+  assert $ expectResult (NonEmptyList ("a🍔🍺":|"a🍔🍺":"a🍔🍺":Nil)) (many1 $ string "a🍔🍺") "a🍔🍺a🍔🍺a🍔🍺"
+  assert $ expectResult (NonEmptyList ("🍔a🍺":|"🍔a🍺":"🍔a🍺":Nil)) (many1 $ string "🍔a🍺") "🍔a🍺🍔a🍺🍔a🍺"
+  assert $ expectResult (NonEmptyList ("🍔🍺a" :| "🍔🍺a":"🍔🍺a":Nil)) (many1 $ string "🍔🍺a") "🍔🍺a🍔🍺a🍔🍺a"
+  assert $ expectResult (NonEmptyList ("a" :| "a":"a":Nil)) (many1 $ string "a") "aaa"
+  assert $ expectResult (NonEmptyList ("abc" :| "abc":"abc":Nil)) (many1 $ string "abc") "abcabcabc"
+  assert $ expectResult (NonEmptyList ("abc" :| "abc":"abc":Nil)) (many1 $ string "abc") "abcabcabc"
+  assert $ expectResult (NonEmptyList ("abc�def" :| Nil)) (many1 $ string "abc�def") "abc�def"
+
+  assert $ expectResult "🍔\xd83c" (string "🍔\xd83c") "🍔🍺"
