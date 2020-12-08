@@ -37,14 +37,14 @@ import Data.String.CodeUnits as SCU
 import Data.String.Pattern (Pattern(..))
 import Data.String.Regex as Regex
 import Data.String.Regex.Flags (noFlags)
-import Text.Parsing.StringParser (Parser(..), ParseError(..), try, fail)
+import Text.Parsing.StringParser (Parser(..), ParseError, try, fail)
 import Text.Parsing.StringParser.Combinators (many, (<?>))
 
 -- | Match the end of the file.
 eof :: Parser Unit
 eof = Parser \s ->
   case s of
-    { str, pos } | pos < SCU.length str -> Left { pos, error: ParseError "Expected EOF" }
+    { str, pos } | pos < SCU.length str -> Left { pos, error: "Expected EOF" }
     _ -> Right { result: unit, suffix: s }
 
 -- | Match any character. This is limited by `Char` to any code points
@@ -54,14 +54,14 @@ anyChar :: Parser Char
 anyChar = Parser \{ str, pos } ->
   case charAt pos str of
     Just chr -> Right { result: chr, suffix: { str, pos: pos + 1 } }
-    Nothing -> Left { pos, error: ParseError "Unexpected EOF" }
+    Nothing -> Left { pos, error: "Unexpected EOF" }
 
 -- | Match any code point, including those above `0xFFFF`
 anyCodePoint :: Parser SCP.CodePoint
 anyCodePoint = Parser \rec@{ str, pos } ->
    case SCP.codePointAt 0 (SCU.drop pos str) of
      Just cp -> Right { result: cp, suffix: { str, pos: pos + SCU.length (SCP.singleton cp) } }
-     Nothing -> Left { pos, error: ParseError "Unexpected EOF" }
+     Nothing -> Left { pos, error: "Unexpected EOF" }
 
 -- | Match any digit.
 anyDigit :: Parser Char
@@ -76,7 +76,7 @@ string :: String -> Parser String
 string nt = Parser \s ->
   case s of
     { str, pos } | SCU.indexOf' (Pattern nt) pos str == Just pos -> Right { result: nt, suffix: { str, pos: pos + SCU.length nt } }
-    { pos } -> Left { pos, error: ParseError ("Expected '" <> nt <> "'.") }
+    { pos } -> Left { pos, error: "Expected '" <> nt <> "'." }
 
 -- | Match a character satisfying the given predicate.
 satisfy :: (Char -> Boolean) -> Parser Char
@@ -158,4 +158,4 @@ regex pat =
             Just (Just matched)  ->
               Right { result: matched, suffix: { str, pos: pos + SCU.length matched } }
             _ ->
-              Left { pos, error: ParseError "no match" }
+              Left { pos, error: "no match" }

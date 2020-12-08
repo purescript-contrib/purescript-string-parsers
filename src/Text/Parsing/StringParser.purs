@@ -26,32 +26,25 @@ type Pos = Int
 type PosString = { str :: String, pos :: Pos }
 
 -- | The type of parsing errors.
-newtype ParseError = ParseError String
-
-instance showParseError :: Show ParseError where
-  show (ParseError msg) = msg
-
-derive instance eqParseError :: Eq ParseError
-
-derive instance ordParseError :: Ord ParseError
+type ParseError = { error :: String, pos :: Pos }
 
 -- | A parser is represented as a function which takes a pair of
 -- | continuations for failure and success.
-newtype Parser a = Parser (PosString -> Either { pos :: Pos, error :: ParseError } { result :: a, suffix :: PosString })
+newtype Parser a = Parser (PosString -> Either ParseError { result :: a, suffix :: PosString })
 
 -- | Run a parser by providing success and failure continuations.
-unParser :: forall a. Parser a -> PosString -> Either { pos :: Pos, error :: ParseError } { result :: a, suffix :: PosString }
+unParser :: forall a. Parser a -> PosString -> Either ParseError { result :: a, suffix :: PosString }
 unParser (Parser p) = p
 
 -- | Run a parser for an input string. If the parser succeeds, the
 -- | result will be returned (i.e. `Right a`). If it fails, the message and
 -- | the position where the parser failed will be outputted
--- | as a `String` (i.e. `Left (msg <> " ; pos = " <> pos)`)
+-- | as a `String` (i.e. `Left (error <> " ; pos = " <> pos)`)
 runParser :: forall a. Parser a -> String -> Either String a
 runParser (Parser p) s = bimap printError _.result (p { str: s, pos: 0 })
   where
-    printError :: { pos :: Pos, error :: ParseError } -> String
-    printError rec = show rec.error <> "; pos = " <> show rec.pos
+    printError :: ParseError -> String
+    printError rec = rec.error <> "; pos = " <> show rec.pos
 
 instance functorParser :: Functor Parser where
   map f (Parser p) = Parser (map (\{ result, suffix } -> { result: f result, suffix }) <<< p)
@@ -99,7 +92,7 @@ instance lazyParser :: Lazy (Parser a) where
 
 -- | Fail with the specified message.
 fail :: forall a. String -> Parser a
-fail msg = Parser \{ pos } -> Left { pos, error: ParseError msg }
+fail error = Parser \{ pos } -> Left { pos, error }
 
 -- | In case of error, the default behavior is to backtrack if no input was consumed.
 -- |
