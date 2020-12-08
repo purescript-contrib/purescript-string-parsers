@@ -36,15 +36,13 @@ newtype Parser a = Parser (PosString -> Either ParseError { result :: a, suffix 
 unParser :: forall a. Parser a -> PosString -> Either ParseError { result :: a, suffix :: PosString }
 unParser (Parser p) = p
 
--- | Run a parser for an input string. If the parser succeeds, the
--- | result will be returned (i.e. `Right a`). If it fails, the message and
--- | the position where the parser failed will be outputted
--- | as a `String` (i.e. `Left (error <> " ; pos = " <> pos)`)
-runParser :: forall a. Parser a -> String -> Either String a
-runParser (Parser p) s = bimap printError _.result (p { str: s, pos: 0 })
-  where
-    printError :: ParseError -> String
-    printError rec = rec.error <> "; pos = " <> show rec.pos
+-- | Run a parser for an input string. See also `printParserError`.
+runParser :: forall a. Parser a -> String -> Either ParseError a
+runParser (Parser p) s = map _.result (p { str: s, pos: 0 })
+
+-- | Prints a ParseError's the error message and the position of the error.
+printParserError :: ParseError -> String
+printParserError rec = rec.error <> "; pos = " <> show rec.pos
 
 instance functorParser :: Functor Parser where
   map f (Parser p) = Parser (map (\{ result, suffix } -> { result: f result, suffix }) <<< p)
