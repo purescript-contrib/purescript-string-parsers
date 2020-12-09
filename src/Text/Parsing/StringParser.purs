@@ -9,7 +9,7 @@ import Control.MonadPlus (class MonadPlus, class MonadZero, class Alternative)
 import Control.Monad.Rec.Class (class MonadRec, tailRecM, Step(..))
 import Control.Plus (class Plus, class Alt)
 import Control.Lazy (class Lazy)
-import Data.Bifunctor (bimap, lmap)
+import Data.Bifunctor (lmap)
 import Data.Either (Either(..))
 
 -- | A position in an input string.
@@ -26,26 +26,28 @@ type Pos = Int
 type PosString = { str :: String, pos :: Pos }
 
 -- | The type of parsing errors.
-newtype ParseError = ParseError String
+type ParseError = { error :: String, pos :: Pos }
 
-instance showParseError :: Show ParseError where
-  show (ParseError msg) = msg
+-- | A parser is represented as a function that, when successful, returns
+-- | a result and the position where the parse finished or, when it fails,
+-- | a ParserError with more information on where and why it failed.
+-- | See also `printParserError`.
+newtype Parser a = Parser (PosString -> Either ParseError { result :: a, suffix :: PosString })
 
-derive instance eqParseError :: Eq ParseError
-
-derive instance ordParseError :: Ord ParseError
-
--- | A parser is represented as a function which takes a pair of
--- | continuations for failure and success.
-newtype Parser a = Parser (PosString -> Either { pos :: Pos, error :: ParseError } { result :: a, suffix :: PosString })
-
--- | Run a parser by providing success and failure continuations.
-unParser :: forall a. Parser a -> PosString -> Either { pos :: Pos, error :: ParseError } { result :: a, suffix :: PosString }
+-- | Run a parser, allowing the caller to define where to start within the
+-- | input `String` and what to do with the unchanged output of the Parser.
+-- | See `runparser` for more typical usages.
+unParser :: forall a. Parser a -> PosString -> Either ParseError { result :: a, suffix :: PosString }
 unParser (Parser p) = p
 
--- | Run a parser for an input string, returning either an error or a result.
+-- | Run a parser for an input string. See also `printParserError`
+-- | and `unParser` for more flexible usages.
 runParser :: forall a. Parser a -> String -> Either ParseError a
-runParser (Parser p) s = bimap _.error _.result (p { str: s, pos: 0 })
+runParser (Parser p) s = map _.result (p { str: s, pos: 0 })
+
+-- | Prints a ParseError's the error message and the position of the error.
+printParserError :: ParseError -> String
+printParserError rec = rec.error <> "; pos = " <> show rec.pos
 
 instance functorParser :: Functor Parser where
   map f (Parser p) = Parser (map (\{ result, suffix } -> { result: f result, suffix }) <<< p)
@@ -93,7 +95,7 @@ instance lazyParser :: Lazy (Parser a) where
 
 -- | Fail with the specified message.
 fail :: forall a. String -> Parser a
-fail msg = Parser \{ pos } -> Left { pos, error: ParseError msg }
+fail error = Parser \{ pos } -> Left { pos, error }
 
 -- | In case of error, the default behavior is to backtrack if no input was consumed.
 -- |
