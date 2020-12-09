@@ -28,11 +28,15 @@ type PosString = { str :: String, pos :: Pos }
 -- | The type of parsing errors.
 type ParseError = { error :: String, pos :: Pos }
 
--- | A parser is represented as a function which takes a pair of
--- | continuations for failure and success.
+-- | A parser is represented as a function that, when successful, returns
+-- | a result and the position where the parse finished or, when it fails,
+-- | a ParserError with more information on where and why it failed.
+-- | See also `printParserError`.
 newtype Parser a = Parser (PosString -> Either ParseError { result :: a, suffix :: PosString })
 
--- | Run a parser by providing success and failure continuations.
+-- | Run a parser, allowing the caller to define where to start within the
+-- | input `String` and what to do with the unchanged output of the Parser.
+-- | See `runparser` for more typical usages.
 unParser :: forall a. Parser a -> PosString -> Either ParseError { result :: a, suffix :: PosString }
 unParser (Parser p) = p
 
