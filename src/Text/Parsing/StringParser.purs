@@ -40,7 +40,8 @@ newtype Parser a = Parser (PosString -> Either ParseError { result :: a, suffix 
 unParser :: forall a. Parser a -> PosString -> Either ParseError { result :: a, suffix :: PosString }
 unParser (Parser p) = p
 
--- | Run a parser for an input string. See also `printParserError`.
+-- | Run a parser for an input string. See also `printParserError`
+-- | and `unParser` for more flexible usages.
 runParser :: forall a. Parser a -> String -> Either ParseError a
 runParser (Parser p) s = map _.result (p { str: s, pos: 0 })
 
