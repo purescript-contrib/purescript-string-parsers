@@ -9,7 +9,7 @@ import Data.List.Types (NonEmptyList)
 import Effect (Effect)
 import Effect.Console (log, logShow)
 import Text.Parsing.StringParser (Parser, fail, runParser, unParser)
-import Text.Parsing.StringParser.CodeUnits (anyChar, char, eof, regex, skipSpaces, string)
+import Text.Parsing.StringParser.CodePoints (anyChar, char, eof, regex, skipSpaces, string)
 import Text.Parsing.StringParser.Combinators (between, endBy1, lookAhead, many, many1, sepBy1, (<?>))
 
 -- Serves only to make this file runnable
