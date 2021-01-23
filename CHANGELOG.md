@@ -14,6 +14,7 @@ New features:
 Bugfixes:
 
 Other improvements:
+- Changed `ParseError` from `data` to a `newtype` (#60)
 - Added usage examples to test/Examples.purs (#52)
 - Changed default branch to `main` from `master`
 - Updated to comply with Contributors library guidelines by adding new issue and pull request templates, updating documentation, and migrating to Spago for local development and CI (#53, #61)
