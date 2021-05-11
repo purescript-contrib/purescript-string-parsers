@@ -7,14 +7,16 @@
   , "control"
   , "effect"
   , "either"
+  , "enums"
   , "foldable-traversable"
   , "lists"
-  , "math"
   , "maybe"
+  , "nonempty"
   , "prelude"
   , "psci-support"
   , "strings"
   , "tailrec"
+  , "unfoldable"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]

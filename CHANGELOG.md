@@ -11,6 +11,7 @@ New features:
 Bugfixes:
 
 Other improvements:
+- Fix transitive dependencies errors found by Spago 0.20 (#71 by @milesfrain)
 
 ## [v6.0.0](https://github.com/purescript-contrib/purescript-string-parsers/releases/tag/v6.0.0) - 2021-02-26
 

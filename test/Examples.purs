@@ -42,6 +42,7 @@ exampleContent1 =
 
 numberOfAs :: Parser Int
 numberOfAs = do
+                                                                        {-
   let
     oneIfA = 1 <$ string "a" <?> "Letter was 'a'"
     zeroIfNotA = 0 <$ regex "[^a]" <?> "Letter was not 'a'"
@@ -49,7 +50,6 @@ numberOfAs = do
                             "The impossible happened: \
                             \a letter was not 'a', and was not not-'a'."
     convertLettersToList = many1 letterIsOneOrZero
-                                                                        {-
   list <- convertLettersToList                                          -}
   list <- many1
           (  (1 <$ string "a")
