@@ -11,6 +11,10 @@ New features:
 Bugfixes:
 
 Other improvements:
+
+## [v6.0.1](https://github.com/purescript-contrib/purescript-string-parsers/releases/tag/v6.0.1) - 2021-05-11
+
+Other improvements:
 - Fix transitive dependencies errors found by Spago 0.20 (#71 by @milesfrain)
 
 ## [v6.0.0](https://github.com/purescript-contrib/purescript-string-parsers/releases/tag/v6.0.0) - 2021-02-26
@@ -21,8 +25,6 @@ Breaking changes:
 
 New features:
 - Added a Monoid instance for Parser (#58)
-
-Bugfixes:
 
 Other improvements:
 - Changed `ParseError` from `data` to a `newtype` (#60)
