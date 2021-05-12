@@ -13,11 +13,12 @@ import Data.String.CodeUnits (singleton)
 import Data.String.Common as SC
 import Data.Unfoldable (replicate)
 import Effect (Effect)
+import Effect.Class.Console (log)
 import Test.Assert (assert', assert)
 import Text.Parsing.StringParser (Parser, runParser, try)
+import Text.Parsing.StringParser.CodeUnits (anyDigit, eof, string, anyChar, regex)
 import Text.Parsing.StringParser.Combinators (many1, endBy1, sepBy1, optionMaybe, many, manyTill, many1Till, chainl, fix, between)
 import Text.Parsing.StringParser.Expr (Assoc(..), Operator(..), buildExprParser)
-import Text.Parsing.StringParser.CodeUnits (anyDigit, eof, string, anyChar, regex)
 
 parens :: forall a. Parser a -> Parser a
 parens = between (string "(") (string ")")
@@ -66,11 +67,8 @@ expectResult res p input = runParser p input == Right res
 
 testCodeUnits :: Effect Unit
 testCodeUnits = do
-  assert' "many should not blow the stack" $ canParse (many (string "a")) (SC.joinWith "" $ replicate 100000 "a")
-  assert' "many failing after" $ parseFail (do
-    as <- many (string "a")
-    eof
-    pure as) (SC.joinWith "" (replicate 100000 "a") <> "b" )
+
+  log "Running basic tests"
 
   assert $ expectResult 3 nested "(((a)))"
   assert $ expectResult ("a":"a":"a":Nil)  (many (string "a")) "aaa"
@@ -93,7 +91,16 @@ testCodeUnits = do
   assert $ expectResult Nil (manyTill (string "a") (string "b")) "b"
   assert $ expectResult (NonEmptyList ("a" :| "a":"a":Nil)) (many1Till (string "a") (string "b")) "aaab"
   assert $ parseFail (many1Till (string "a") (string "b")) "b"
-  -- check against overflow
-  assert $ canParse (many1Till (string "a") (string "and")) $ (fold <<< take 10000 $ repeat "a") <> "and"
   -- check correct order
   assert $ expectResult (NonEmptyList ('a' :| 'b':'c':Nil)) (many1Till anyChar (string "d")) "abcd"
+
+  log "Running overflow tests (may take a while)"
+
+  -- check against overflow
+  assert $ canParse (many1Till (string "a") (string "and")) $ (fold <<< take 10000 $ repeat "a") <> "and"
+
+  assert' "many should not blow the stack" $ canParse (many (string "a")) (SC.joinWith "" $ replicate 100000 "a")
+  assert' "many failing after" $ parseFail (do
+    as <- many (string "a")
+    eof
+    pure as) (SC.joinWith "" (replicate 100000 "a") <> "b" )
