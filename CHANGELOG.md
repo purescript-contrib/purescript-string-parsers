@@ -12,10 +12,12 @@ Bugfixes:
 
 Other improvements:
 
+- Run slowest tests last and print status updates (#72)
+
 ## [v6.0.1](https://github.com/purescript-contrib/purescript-string-parsers/releases/tag/v6.0.1) - 2021-05-11
 
 Other improvements:
-- Fix transitive dependencies errors found by Spago 0.20 (#71 by @milesfrain)
+- Fix transitive dependencies errors found by Spago 0.20 (#71)
 
 ## [v6.0.0](https://github.com/purescript-contrib/purescript-string-parsers/releases/tag/v6.0.0) - 2021-02-26
 
