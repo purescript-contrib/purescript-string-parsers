@@ -19,49 +19,52 @@ import Text.Parsing.StringParser.Combinators (choice, (<?>))
 data Assoc = AssocNone | AssocLeft | AssocRight
 
 -- | Operator types: infix, prefix, postfix.
-data Operator a = Infix   (Parser (a -> a -> a)) Assoc
-                | Prefix  (Parser (a -> a))
-                | Postfix (Parser (a -> a))
+data Operator a
+  = Infix (Parser (a -> a -> a)) Assoc
+  | Prefix (Parser (a -> a))
+  | Postfix (Parser (a -> a))
 
 -- | An operator table arranges operators into precedence groups.
 type OperatorTable a = Array (Array (Operator a))
 
-type SplitAccum a = { rassoc  :: List (Parser (a -> a -> a))
-                    , lassoc  :: List (Parser (a -> a -> a))
-                    , nassoc  :: List (Parser (a -> a -> a))
-                    , prefix  :: List (Parser (a -> a))
-                    , postfix :: List (Parser (a -> a))
-                    }
+type SplitAccum a =
+  { rassoc :: List (Parser (a -> a -> a))
+  , lassoc :: List (Parser (a -> a -> a))
+  , nassoc :: List (Parser (a -> a -> a))
+  , prefix :: List (Parser (a -> a))
+  , postfix :: List (Parser (a -> a))
+  }
 
 buildExprParser :: forall a. OperatorTable a -> Parser a -> Parser a
 buildExprParser operators simpleExpr =
   let
     makeParser term ops =
       let
-        accum     = foldr splitOp { rassoc: Nil, lassoc: Nil, nassoc: Nil, prefix: Nil, postfix: Nil } ops
+        accum = foldr splitOp { rassoc: Nil, lassoc: Nil, nassoc: Nil, prefix: Nil, postfix: Nil } ops
 
-        rassocOp  = choice accum.rassoc
-        lassocOp  = choice accum.lassoc
-        nassocOp  = choice accum.nassoc
-        prefixOp  = choice accum.prefix <?> ""
+        rassocOp = choice accum.rassoc
+        lassocOp = choice accum.lassoc
+        nassocOp = choice accum.nassoc
+        prefixOp = choice accum.prefix <?> ""
         postfixOp = choice accum.postfix <?> ""
 
         postfixP = postfixOp <|> pure identity
-        prefixP  = prefixOp <|> pure identity
-      in do
-        x <- termP prefixP term postfixP
-        rassocP x rassocOp prefixP term postfixP
-          <|> lassocP x lassocOp prefixP term postfixP
-          <|> nassocP x nassocOp prefixP term postfixP
-          <|> pure x
-          <?> "operator"
+        prefixP = prefixOp <|> pure identity
+      in
+        do
+          x <- termP prefixP term postfixP
+          rassocP x rassocOp prefixP term postfixP
+            <|> lassocP x lassocOp prefixP term postfixP
+            <|> nassocP x nassocOp prefixP term postfixP
+            <|> pure x
+            <?> "operator"
 
     splitOp :: forall b. Operator b -> SplitAccum b -> SplitAccum b
-    splitOp (Infix op AssocNone)  accum = accum { nassoc  = Cons op accum.nassoc }
-    splitOp (Infix op AssocLeft)  accum = accum { lassoc  = Cons op accum.lassoc }
-    splitOp (Infix op AssocRight) accum = accum { rassoc  = Cons op accum.rassoc }
-    splitOp (Prefix  op)          accum = accum { prefix  = Cons op accum.prefix }
-    splitOp (Postfix op)          accum = accum { postfix = Cons op accum.postfix }
+    splitOp (Infix op AssocNone) accum = accum { nassoc = Cons op accum.nassoc }
+    splitOp (Infix op AssocLeft) accum = accum { lassoc = Cons op accum.lassoc }
+    splitOp (Infix op AssocRight) accum = accum { rassoc = Cons op accum.rassoc }
+    splitOp (Prefix op) accum = accum { prefix = Cons op accum.prefix }
+    splitOp (Postfix op) accum = accum { postfix = Cons op accum.postfix }
 
     rassocP :: forall b c d. b -> Parser (b -> b -> b) -> Parser (c -> d) -> Parser c -> Parser (d -> b) -> Parser b
     rassocP x rassocOp prefixP term postfixP = do
@@ -91,9 +94,10 @@ buildExprParser operators simpleExpr =
 
     termP :: forall b c d. Parser (b -> c) -> Parser b -> Parser (c -> d) -> Parser d
     termP prefixP term postfixP = do
-      pre   <- prefixP
-      x     <- term
-      post  <- postfixP
+      pre <- prefixP
+      x <- term
+      post <- postfixP
       pure (post (pre x))
 
-  in foldl (makeParser) simpleExpr operators
+  in
+    foldl (makeParser) simpleExpr operators
