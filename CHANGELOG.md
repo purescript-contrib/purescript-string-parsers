@@ -11,6 +11,7 @@ New features:
 Bugfixes:
 
 Other improvements:
+- Added `purs-tidy` formatter (#76 by @thomashoneyman)
 
 - Run slowest tests last and print status updates (#72)
 
