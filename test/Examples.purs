@@ -30,8 +30,9 @@ printResults = do
   doBoth "badExtractWords" badExtractWords exampleContent1
   doBoth "quotedLetterExists" quotedLetterExists exampleContent1
 
-  log "\n\
-       \### Example Content 2 ###"
+  log
+    "\n\
+    \### Example Content 2 ###"
   doBoth "parseCSV" parseCSV exampleContent2
 
 -- Example Content 1
@@ -42,7 +43,7 @@ exampleContent1 =
 
 numberOfAs :: Parser Int
 numberOfAs = do
-                                                                        {-
+  {-
   let
     oneIfA = 1 <$ string "a" <?> "Letter was 'a'"
     zeroIfNotA = 0 <$ regex "[^a]" <?> "Letter was not 'a'"
@@ -52,32 +53,34 @@ numberOfAs = do
     convertLettersToList = many1 letterIsOneOrZero
   list <- convertLettersToList                                          -}
   list <- many1
-          (  (1 <$ string "a")
-         <|> (0 <$ regex "[^a]")
-          )
+    ( (1 <$ string "a")
+        <|> (0 <$ regex "[^a]")
+    )
   -- calculate total number by adding Ints in list together
   pure $ sum list
 
 removePunctuation :: Parser String
-removePunctuation = do                                                      {-
+removePunctuation =
+  do {-
   let
     charsAndSpaces = regex "[a-zA-Z ]+"
     everythingElse = regex "[^a-zA-Z ]+"
     ignoreEverythingElse = "" <$ everythingElse
     zeroOrMoreFragments = many1 $ charsAndSpaces <|> ignoreEverythingElse   -}
-  list <- many1
-              ( regex "[a-zA-Z ]+"
-             <|> ("" <$ regex "[^a-zA-Z ]+" )
-              )
+    list <- many1
+      ( regex "[a-zA-Z ]+"
+          <|> ("" <$ regex "[^a-zA-Z ]+")
+      )
 
-  -- combine the list's contents together via '<>'
-  pure $ foldl (<>) "" list
+    -- combine the list's contents together via '<>'
+    pure $ foldl (<>) "" list
 
 replaceVowelsWithUnderscore :: Parser String
 replaceVowelsWithUnderscore = do
-  list <- many1 $ (  ( "_" <$ regex "[aeiou]")
-                 <|> regex "[^aeiou]+"
-                  )
+  list <- many1 $
+    ( ("_" <$ regex "[aeiou]")
+        <|> regex "[^aeiou]+"
+    )
 
   pure $ foldl (<>) "" list
 
@@ -88,28 +91,36 @@ tokenizeContentBySpaceChars = do
 extractWords :: Parser (NonEmptyList String)
 extractWords = do
   endBy1 (regex "[a-zA-Z]+")
-         -- try commenting out one of the "<|> string ..." lines and see what happens
-         (many1 (  string " " <?> "Failed to match space as a separator"
-               <|> string "'" <?> "Failed to match single-quote char as a separator"
-               <|> string "," <?> "Failed to match comma as a separator"
-               <|> string "?" <?> "Failed to match question mark as a separator"
-               <|> string "." <?> "Failed to match period as a separator"
-               <?> "Could not find a character that separated the content..."
-                )
-         )
+    -- try commenting out one of the "<|> string ..." lines and see what happens
+    ( many1
+        ( string " " <?> "Failed to match space as a separator"
+            <|> string "'"
+            <?> "Failed to match single-quote char as a separator"
+            <|> string ","
+            <?> "Failed to match comma as a separator"
+            <|> string "?"
+            <?> "Failed to match question mark as a separator"
+            <|> string "."
+            <?> "Failed to match period as a separator"
+            <?> "Could not find a character that separated the content..."
+        )
+    )
 
 badExtractWords :: Parser (NonEmptyList String)
 badExtractWords = do
   list <- endBy1 (regex "[a-zA-Z]+")
-                 -- try commenting out the below "<|> string ..." lines
-                 (many1 (  string " " <?> "Failed to match space as a separator"
-                       <|> string "'" <?> "Failed to match single-quote char as a separator"
-                       <|> string "," <?> "Failed to match comma as a separator"
-                       -- <|> string "?" <?> "Failed to match question mark as a separator"
-                       -- <|> string "." <?> "Failed to match period as a separator"
-                       <?> "Could not find a character that separated the content..."
-                        )
-                 )
+    -- try commenting out the below "<|> string ..." lines
+    ( many1
+        ( string " " <?> "Failed to match space as a separator"
+            <|> string "'"
+            <?> "Failed to match single-quote char as a separator"
+            <|> string ","
+            <?> "Failed to match comma as a separator"
+            -- <|> string "?" <?> "Failed to match question mark as a separator"
+            -- <|> string "." <?> "Failed to match period as a separator"
+            <?> "Could not find a character that separated the content..."
+        )
+    )
   -- short for 'end of file' or 'end of content'
   eof <?> "Entire content should have been parsed but wasn't."
   pure list
@@ -123,9 +134,10 @@ quotedLetterExists = do
     betweenSingleQuotes parser =
       between singleQuoteChar singleQuoteChar parser
 
-  list <- many (   true <$ (betweenSingleQuotes (char 'a') <?> "No 'a' found.")
-              <|> false <$ anyChar
-               )
+  list <- many
+    ( true <$ (betweenSingleQuotes (char 'a') <?> "No 'a' found.")
+        <|> false <$ anyChar
+    )
   pure $ foldl (||) false list
 
 -- Example Content 2
@@ -158,11 +170,15 @@ parseCSV = do
     csvColumn = regex "[^,]+"
 
   -- parse headers but don't produce output
-  void $ idNumber_ *> commaThenSpaces *>
-         firstName_ *> commaThenSpaces *>
-         lastName_ *> commaThenSpaces *>
-         age_ *> commaThenSpaces *>
-         email_
+  void $ idNumber_ *> commaThenSpaces
+    *> firstName_
+    *> commaThenSpaces
+    *> lastName_
+    *> commaThenSpaces
+    *> age_
+    *> commaThenSpaces
+    *>
+      email_
 
   void newline
 
@@ -182,9 +198,10 @@ parseCSV = do
     parsePeriodsAndPlusesAsEmptyStrings =
       "" <$ ((string ".") <|> (string "+"))
     parseListOfParts =
-      many1  (  parseAlphanumericChars
+      many1
+        ( parseAlphanumericChars
             <|> parsePeriodsAndPlusesAsEmptyStrings
-             )
+        )
 
   usernameWithoutPeriodsOrPluses <- fold <$> parseListOfParts
   void $ string "@"
@@ -195,9 +212,14 @@ parseCSV = do
   void eof
 
   -- now return the parsed content
-  pure { idNumber, firstName, lastName, age, originalEmail
-       , modifiedEmail: usernameWithoutPeriodsOrPluses <> "@" <> domainName
-       }
+  pure
+    { idNumber
+    , firstName
+    , lastName
+    , age
+    , originalEmail
+    , modifiedEmail: usernameWithoutPeriodsOrPluses <> "@" <> domainName
+    }
 
 -- Helper functions
 
@@ -213,12 +235,17 @@ doUnParser :: forall a. Show a => String -> Parser a -> String -> Effect Unit
 doUnParser parserName parser content = do
   log $ "(unParser) Parsing content with '" <> parserName <> "'"
   case unParser parser { str: content, pos: 0 } of
-    Left rec -> log $ "Position: " <> show rec.pos <> "\n\
-                      \Error: " <> show rec.error
-    Right rec -> log $ "Result was: " <> show rec.result <> "\n\
-                       \Suffix was: " <> show rec.suffix
+    Left rec -> log $ "Position: " <> show rec.pos
+      <>
+        "\n\
+        \Error: "
+      <> show rec.error
+    Right rec -> log $ "Result was: " <> show rec.result
+      <>
+        "\n\
+        \Suffix was: "
+      <> show rec.suffix
   log "-----"
-
 
 -- | Shows the results of calling `runParser`. You typically don't want to use
 -- | this function when writing a parser because it doesn't help you debug

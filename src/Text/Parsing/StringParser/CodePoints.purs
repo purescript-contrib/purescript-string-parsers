@@ -55,15 +55,14 @@ anyChar = Parser \{ str, pos } ->
       Nothing -> Left { pos, error: "CodePoint " <> show cp <> " is not a character" }
     Nothing -> Left { pos, error: "Unexpected EOF" }
   where
-    toChar = fromCharCode <<< fromEnum
+  toChar = fromCharCode <<< fromEnum
 
 -- | Match any digit.
 anyDigit :: Parser Char
 anyDigit = try do
   c <- anyChar
-  if c >= '0' && c <= '9'
-     then pure c
-     else fail $ "Character " <> show c <> " is not a digit"
+  if c >= '0' && c <= '9' then pure c
+  else fail $ "Character " <> show c <> " is not a digit"
 
 -- | Match the specified string.
 string :: String -> Parser String
@@ -76,9 +75,8 @@ string nt = Parser \s ->
 satisfy :: (Char -> Boolean) -> Parser Char
 satisfy f = try do
   c <- anyChar
-  if f c
-     then pure c
-     else fail $ "Character " <> show c <> " did not satisfy predicate"
+  if f c then pure c
+  else fail $ "Character " <> show c <> " did not satisfy predicate"
 
 -- | Match the specified character.
 char :: Char -> Parser Char
@@ -87,7 +85,7 @@ char c = satisfy (_ == c) <?> "Could not match character " <> show c
 -- | Match many whitespace characters.
 whiteSpace :: Parser String
 whiteSpace = do
-  cs <- many (satisfy \ c -> c == '\n' || c == '\r' || c == ' ' || c == '\t')
+  cs <- many (satisfy \c -> c == '\n' || c == '\r' || c == ' ' || c == '\t')
   pure (foldMap singleton cs)
 
 -- | Skip many whitespace characters.
@@ -106,17 +104,15 @@ noneOf = satisfy <<< flip notElem
 lowerCaseChar :: Parser Char
 lowerCaseChar = try do
   c <- anyChar
-  if toCharCode c `elem` (97 .. 122)
-     then pure c
-     else fail $ "Expected a lower case character but found " <> show c
+  if toCharCode c `elem` (97 .. 122) then pure c
+  else fail $ "Expected a lower case character but found " <> show c
 
 -- | Match any upper case character.
 upperCaseChar :: Parser Char
 upperCaseChar = try do
   c <- anyChar
-  if toCharCode c `elem` (65 .. 90)
-     then pure c
-     else fail $ "Expected an upper case character but found " <> show c
+  if toCharCode c `elem` (65 .. 90) then pure c
+  else fail $ "Expected an upper case character but found " <> show c
 
 -- | Match any letter.
 anyLetter :: Parser Char
@@ -135,21 +131,17 @@ regex pat =
     Right r ->
       matchRegex r
   where
-    -- ensure the pattern only matches the current position in the parse
-    pattern =
-      case stripPrefix (Pattern "^") pat of
-        Nothing ->
-          "^" <> pat
-        _ ->
-          pat
-    matchRegex :: Regex.Regex -> Parser String
-    matchRegex r =
-      Parser \{ str, pos } ->
-        let
-          remainder = drop pos str
-        in
-          case NEA.head <$> Regex.match r remainder of
-            Just (Just matched)  ->
-              Right { result: matched, suffix: { str, pos: pos + length matched } }
-            _ ->
-              Left { pos, error: "no match" }
+  -- ensure the pattern only matches the current position in the parse
+  pattern =
+    case stripPrefix (Pattern "^") pat of
+      Nothing -> "^" <> pat
+      _ -> pat
+
+  matchRegex :: Regex.Regex -> Parser String
+  matchRegex r = Parser \{ str, pos } -> do
+    let remainder = drop pos str
+    case NEA.head <$> Regex.match r remainder of
+      Just (Just matched) ->
+        Right { result: matched, suffix: { str, pos: pos + length matched } }
+      _ ->
+        Left { pos, error: "no match" }

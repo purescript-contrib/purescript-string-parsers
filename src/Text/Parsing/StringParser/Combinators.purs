@@ -1,10 +1,10 @@
 -- | This module defines combinators for building string parsers.
-
 module Text.Parsing.StringParser.Combinators
   ( lookAhead
   , many
   , many1
-  , withError, (<?>)
+  , withError
+  , (<?>)
   , between
   , option
   , optional
@@ -97,9 +97,11 @@ sepEndBy p sep = map NEL.toList (sepEndBy1 p sep) <|> pure Nil
 sepEndBy1 :: forall a sep. Parser a -> Parser sep -> Parser (NonEmptyList a)
 sepEndBy1 p sep = do
   a <- p
-  (do _ <- sep
+  ( do
+      _ <- sep
       as <- sepEndBy p sep
-      pure (cons' a as)) <|> pure (NEL.singleton a)
+      pure (cons' a as)
+  ) <|> pure (NEL.singleton a)
 
 -- | Parse one or more separated values, ending with a separator.
 endBy1 :: forall a sep. Parser a -> Parser sep -> Parser (NonEmptyList a)
@@ -125,9 +127,12 @@ chainl1 p f = do
 
 -- | Parse one or more values separated by a left-associative operator.
 chainl1' :: forall a. Parser a -> Parser (a -> a -> a) -> a -> Parser a
-chainl1' p f a = (do f' <- f
-                     a' <- p
-                     chainl1' p f (f' a a')) <|> pure a
+chainl1' p f a =
+  ( do
+      f' <- f
+      a' <- p
+      chainl1' p f (f' a a')
+  ) <|> pure a
 
 -- | Parse one or more values separated by a right-associative operator.
 chainr1 :: forall a. Parser a -> Parser (a -> a -> a) -> Parser a
@@ -137,9 +142,12 @@ chainr1 p f = do
 
 -- | Parse one or more values separated by a right-associative operator.
 chainr1' :: forall a. Parser a -> Parser (a -> a -> a) -> a -> Parser a
-chainr1' p f a = (do f' <- f
-                     a' <- chainr1 p f
-                     pure $ f' a a') <|> pure a
+chainr1' p f a =
+  ( do
+      f' <- f
+      a' <- chainr1 p f
+      pure $ f' a a'
+  ) <|> pure a
 
 -- | Parse using any of a collection of parsers.
 choice :: forall f a. Foldable f => f (Parser a) -> Parser a
@@ -155,13 +163,13 @@ many1Till p end = do
   x <- p
   tailRecM inner (pure x)
   where
-    ending acc = do
-      _ <- end
-      pure $ Done (NEL.reverse acc)
-    continue acc = do
-      c <- p
-      pure $ Loop (NEL.cons c acc)
-    inner acc = ending acc <|> continue acc
+  ending acc = do
+    _ <- end
+    pure $ Done (NEL.reverse acc)
+  continue acc = do
+    c <- p
+    pure $ Loop (NEL.cons c acc)
+  inner acc = ending acc <|> continue acc
 
 cons' :: forall a. a -> List a -> NonEmptyList a
 cons' h t = NonEmptyList (h :| t)

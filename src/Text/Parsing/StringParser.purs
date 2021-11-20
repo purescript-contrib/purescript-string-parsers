@@ -64,8 +64,9 @@ instance applicativeParser :: Applicative Parser where
 instance altParser :: Alt Parser where
   alt (Parser p1) (Parser p2) = Parser \s ->
     case p1 s of
-      Left { error, pos } | s.pos == pos -> p2 s
-                          | otherwise -> Left { error, pos }
+      Left { error, pos }
+        | s.pos == pos -> p2 s
+        | otherwise -> Left { error, pos }
       right -> right
 
 instance plusParser :: Plus Parser where
@@ -87,8 +88,8 @@ instance monadPlusParser :: MonadPlus Parser
 instance monadRecParser :: MonadRec Parser where
   tailRecM f a = Parser \str -> tailRecM (\st -> map split (unParser (f st.state) st.str)) { state: a, str }
     where
-      split { result: Loop state, suffix: str } = Loop { state, str }
-      split { result: Done b, suffix } = Done { result: b, suffix }
+    split { result: Loop state, suffix: str } = Loop { state, str }
+    split { result: Done b, suffix } = Done { result: b, suffix }
 
 instance lazyParser :: Lazy (Parser a) where
   defer f = Parser $ \str -> unParser (f unit) str
@@ -101,7 +102,7 @@ fail error = Parser \{ pos } -> Left { pos, error }
 -- |
 -- | `try p` backtracks even if input was consumed.
 try :: forall a. Parser a -> Parser a
-try (Parser p) = Parser \(s@{ pos }) -> lmap (_ { pos = pos}) (p s)
+try (Parser p) = Parser \(s@{ pos }) -> lmap (_ { pos = pos }) (p s)
 
 instance semigroupParser :: Semigroup a => Semigroup (Parser a) where
   append = lift2 append
