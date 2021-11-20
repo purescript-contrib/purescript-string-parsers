@@ -36,7 +36,7 @@ type SplitAccum a =
   }
 
 buildExprParser :: forall a. OperatorTable a -> Parser a -> Parser a
-buildExprParser operators simpleExpr =
+buildExprParser operators simpleExpr = do
   let
     makeParser term ops =
       let
@@ -99,5 +99,4 @@ buildExprParser operators simpleExpr =
       post <- postfixP
       pure (post (pre x))
 
-  in
-    foldl (makeParser) simpleExpr operators
+  foldl (makeParser) simpleExpr operators

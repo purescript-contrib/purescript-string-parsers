@@ -129,19 +129,14 @@ regex pat =
   -- ensure the pattern only matches the current position in the parse
   pattern =
     case SCU.stripPrefix (Pattern "^") pat of
-      Nothing ->
-        "^" <> pat
-      _ ->
-        pat
+      Nothing -> "^" <> pat
+      _ -> pat
 
   matchRegex :: Regex.Regex -> Parser String
-  matchRegex r =
-    Parser \{ str, pos } ->
-      let
-        remainder = SCU.drop pos str
-      in
-        case NEA.head <$> Regex.match r remainder of
-          Just (Just matched) ->
-            Right { result: matched, suffix: { str, pos: pos + SCU.length matched } }
-          _ ->
-            Left { pos, error: "no match" }
+  matchRegex r = Parser \{ str, pos } -> do
+    let remainder = SCU.drop pos str
+    case NEA.head <$> Regex.match r remainder of
+      Just (Just matched) ->
+        Right { result: matched, suffix: { str, pos: pos + SCU.length matched } }
+      _ ->
+        Left { pos, error: "no match" }

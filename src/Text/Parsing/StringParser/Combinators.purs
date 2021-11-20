@@ -1,5 +1,4 @@
 -- | This module defines combinators for building string parsers.
-
 module Text.Parsing.StringParser.Combinators
   ( lookAhead
   , many
