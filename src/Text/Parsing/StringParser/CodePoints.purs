@@ -132,10 +132,7 @@ regex pat =
       matchRegex r
   where
   -- ensure the pattern only matches the current position in the parse
-  pattern =
-    case stripPrefix (Pattern "^") pat of
-      Nothing -> "^" <> pat
-      _ -> pat
+  pattern = "^(" <> pat <> ")"
 
   matchRegex :: Regex.Regex -> Parser String
   matchRegex r = Parser \{ str, pos } -> do
