@@ -9,6 +9,7 @@ Breaking changes:
 New features:
 
 Bugfixes:
+- Issue #69: Fix regex parser to always wrap pattern inside `^(..)` (#80 by @chtenb)
 
 Other improvements:
 - Added `purs-tidy` formatter (#76 by @thomashoneyman)
