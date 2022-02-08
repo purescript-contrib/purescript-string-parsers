@@ -17,7 +17,7 @@ import Effect.Class.Console (log)
 import Test.Assert (assert', assert)
 import Text.Parsing.StringParser (Parser, runParser, try)
 import Text.Parsing.StringParser.CodeUnits (anyDigit, eof, string, anyChar, regex)
-import Text.Parsing.StringParser.Combinators (many1, endBy1, sepBy1, optionMaybe, many, manyTill, many1Till, chainl, fix, between)
+import Text.Parsing.StringParser.Combinators (between, chainl, endBy1, fix, lookAhead, many, many1, many1Till, manyTill, optionMaybe, sepBy1)
 import Text.Parsing.StringParser.Expr (Assoc(..), Operator(..), buildExprParser)
 
 parens :: forall a. Parser a -> Parser a
@@ -105,6 +105,8 @@ testCodeUnits = do
   assert $ parseFail (many1Till (string "a") (string "b")) "b"
   -- check correct order
   assert $ expectResult (NonEmptyList ('a' :| 'b' : 'c' : Nil)) (many1Till anyChar (string "d")) "abcd"
+  -- lookahead should not consume in case of failure
+  assert $ expectResult ("abc") (lookAhead (string "a" *> string "x") <|> string "abc") "abc"
 
   log "Running overflow tests (may take a while)"
 

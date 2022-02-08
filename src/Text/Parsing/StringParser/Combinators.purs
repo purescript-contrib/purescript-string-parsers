@@ -46,7 +46,7 @@ lookAhead :: forall a. Parser a -> Parser a
 lookAhead (Parser p) = Parser \s ->
   case p s of
     Right { result } -> Right { result, suffix: s }
-    left -> left
+    Left { error } -> Left { error, pos: s.pos }
 
 -- | Match zero or more times.
 many :: forall a. Parser a -> Parser (List a)

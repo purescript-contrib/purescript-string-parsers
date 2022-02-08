@@ -102,7 +102,7 @@ fail error = Parser \{ pos } -> Left { pos, error }
 -- |
 -- | `try p` backtracks even if input was consumed.
 try :: forall a. Parser a -> Parser a
-try (Parser p) = Parser \(s@{ pos }) -> lmap (_ { pos = pos }) (p s)
+try (Parser p) = Parser \s -> lmap (_ { pos = s.pos }) (p s)
 
 instance semigroupParser :: Semigroup a => Semigroup (Parser a) where
   append = lift2 append

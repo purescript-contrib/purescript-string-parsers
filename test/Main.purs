@@ -9,8 +9,8 @@ import Test.CodeUnits (testCodeUnits)
 
 main :: Effect Unit
 main = do
-  log "Testing CodePoint parsing\n"
-  testCodePoints
-
-  log "\n\nTesting CodeUnit parsing\n"
+  log "Testing CodeUnit parsing\n"
   testCodeUnits
+
+  log "\n\nTesting CodePoint parsing\n"
+  testCodePoints
