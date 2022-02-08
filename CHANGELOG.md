@@ -9,6 +9,7 @@ Breaking changes:
 New features:
 
 Bugfixes:
+- Fix #73: make lookahead to not consume input on failure (#81 @chtenb)
 
 Other improvements:
 - Added `purs-tidy` formatter (#76 by @thomashoneyman)
