@@ -3,8 +3,7 @@
 [![CI](https://github.com/purescript-contrib/purescript-string-parsers/workflows/CI/badge.svg?branch=main)](https://github.com/purescript-contrib/purescript-string-parsers/actions?query=workflow%3ACI+branch%3Amain)
 [![Release](http://img.shields.io/github/release/purescript-contrib/purescript-string-parsers.svg)](https://github.com/purescript-contrib/purescript-string-parsers/releases)
 [![Pursuit](http://pursuit.purescript.org/packages/purescript-string-parsers/badge)](http://pursuit.purescript.org/packages/purescript-string-parsers)
-[![Maintainer: garyb](https://img.shields.io/badge/maintainer-garyb-teal.svg)](http://github.com/garyb)
-[![Maintainer: thomashoneyman](https://img.shields.io/badge/maintainer-thomashoneyman-teal.svg)](http://github.com/thomashoneyman)
+[![Maintainer: chtenb](https://img.shields.io/badge/maintainer-chtenb-teal.svg)](http://github.com/chtenb)
 
 A parsing library for parsing strings.
 
