@@ -99,6 +99,8 @@ testCodePoints = do
   assert $ expectResult (NonEmptyList ('0' :| '1' : '2' : '3' : '4' : Nil)) (many1 anyDigit) "01234/"
   assert $ expectResult (NonEmptyList ('5' :| '6' : '7' : '8' : '9' : Nil)) (many1 anyDigit) "56789:"
   assert $ expectResult "aaaa" (regex "a+") "aaaab"
+  assert $ expectResult "aaaa" (regex "^a+") "aaaab"
+  assert $ parseFail (regex "a|b") "xb"
   assert $ expectResult ("a" : "a" : "a" : Nil) (manyTill (string "a") (string "b")) "aaab"
   assert $ expectResult Nil (manyTill (string "a") (string "b")) "b"
   assert $ expectResult (NonEmptyList ("a" :| "a" : "a" : Nil)) (many1Till (string "a") (string "b")) "aaab"

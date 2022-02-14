@@ -31,7 +31,7 @@ import Data.Either (Either(..))
 import Data.Enum (fromEnum)
 import Data.Foldable (class Foldable, foldMap, elem, notElem)
 import Data.Maybe (Maybe(..))
-import Data.String.CodePoints (codePointAt, drop, indexOf', length, stripPrefix)
+import Data.String.CodePoints (codePointAt, drop, indexOf', length)
 import Data.String.CodeUnits (singleton)
 import Data.String.Pattern (Pattern(..))
 import Data.String.Regex as Regex
@@ -132,10 +132,7 @@ regex pat =
       matchRegex r
   where
   -- ensure the pattern only matches the current position in the parse
-  pattern =
-    case stripPrefix (Pattern "^") pat of
-      Nothing -> "^" <> pat
-      _ -> pat
+  pattern = "^(" <> pat <> ")"
 
   matchRegex :: Regex.Regex -> Parser String
   matchRegex r = Parser \{ str, pos } -> do

@@ -10,6 +10,7 @@ New features:
 
 Bugfixes:
 - Fix #73: make lookahead to not consume input on failure (#81 @chtenb)
+- Issue #69: Fix regex parser to always wrap pattern inside `^(..)` (#80 by @chtenb)
 
 Other improvements:
 - Added `purs-tidy` formatter (#76 by @thomashoneyman)
