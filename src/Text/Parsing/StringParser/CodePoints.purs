@@ -31,7 +31,7 @@ import Data.Either (Either(..))
 import Data.Enum (fromEnum)
 import Data.Foldable (class Foldable, foldMap, elem, notElem)
 import Data.Maybe (Maybe(..))
-import Data.String.CodePoints (codePointAt, drop, indexOf', length, stripPrefix)
+import Data.String.CodePoints (codePointAt, drop, indexOf', length)
 import Data.String.CodeUnits (singleton)
 import Data.String.Pattern (Pattern(..))
 import Data.String.Regex as Regex
