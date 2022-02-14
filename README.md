@@ -3,8 +3,7 @@
 [![CI](https://github.com/purescript-contrib/purescript-string-parsers/workflows/CI/badge.svg?branch=main)](https://github.com/purescript-contrib/purescript-string-parsers/actions?query=workflow%3ACI+branch%3Amain)
 [![Release](http://img.shields.io/github/release/purescript-contrib/purescript-string-parsers.svg)](https://github.com/purescript-contrib/purescript-string-parsers/releases)
 [![Pursuit](http://pursuit.purescript.org/packages/purescript-string-parsers/badge)](http://pursuit.purescript.org/packages/purescript-string-parsers)
-[![Maintainer: garyb](https://img.shields.io/badge/maintainer-garyb-teal.svg)](http://github.com/garyb)
-[![Maintainer: thomashoneyman](https://img.shields.io/badge/maintainer-thomashoneyman-teal.svg)](http://github.com/thomashoneyman)
+[![Maintainer: chtenb](https://img.shields.io/badge/maintainer-chtenb-teal.svg)](http://github.com/chtenb)
 
 A parsing library for parsing strings.
 
@@ -46,3 +45,11 @@ You can contribute to `string-parsers` in several ways:
 2. If you would like to contribute code, tests, or documentation, please [read the contributor guide](./CONTRIBUTING.md). It's a short, helpful introduction to contributing to this library, including development instructions.
 
 3. If you have written a library, tutorial, guide, or other resource based on this package, please share it on the [PureScript Discourse](https://discourse.purescript.org)! Writing libraries and learning resources are a great way to help this library succeed.
+
+## Benchmark
+
+To execute the benchmarks run the following command
+
+```
+spago run --main Bench.Main
+```
