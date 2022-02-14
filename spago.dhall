@@ -11,6 +11,7 @@
   , "foldable-traversable"
   , "lists"
   , "maybe"
+  , "minibench"
   , "nonempty"
   , "prelude"
   , "psci-support"
@@ -19,5 +20,5 @@
   , "unfoldable"
   ]
 , packages = ./packages.dhall
-, sources = [ "src/**/*.purs", "test/**/*.purs" ]
+, sources = [ "src/**/*.purs", "test/**/*.purs", "bench/**/*.purs" ]
 }
