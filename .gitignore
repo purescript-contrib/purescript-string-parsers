@@ -7,3 +7,7 @@
 output
 generated-docs
 bower_components
+
+node_modules
+package.json
+package-lock.json

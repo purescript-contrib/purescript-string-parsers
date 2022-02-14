@@ -12,7 +12,7 @@ Bugfixes:
 
 Other improvements:
 - Added `purs-tidy` formatter (#76 by @thomashoneyman)
-
+- Add a benchmark module (#79 by @chtenb)
 - Run slowest tests last and print status updates (#72)
 
 ## [v6.0.1](https://github.com/purescript-contrib/purescript-string-parsers/releases/tag/v6.0.1) - 2021-05-11
