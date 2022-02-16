@@ -12,10 +12,10 @@ import Control.Lazy (class Lazy)
 import Data.Bifunctor (lmap)
 import Data.Either (Either(..))
 
--- | A CodeUnit-based index into an input string.
+-- | A position in an input string.
 type Pos = Int
 
--- | Strings are represented as a string with a CodeUnit-based index from the
+-- | Strings are represented as a string with an index from the
 -- | start of the string.
 -- |
 -- | `{ str: s, pos: n }` is interpreted as the substring of `s`
