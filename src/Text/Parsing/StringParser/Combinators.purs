@@ -1,7 +1,6 @@
 -- | This module defines combinators for building string parsers.
 module Text.Parsing.StringParser.Combinators
-  ( lookAhead
-  , many
+  ( many
   , many1
   , withError
   , (<?>)
@@ -32,21 +31,13 @@ import Prelude
 import Control.Alt ((<|>))
 import Control.Lazy (fix)
 import Control.Monad.Rec.Class (Step(..), tailRecM)
-import Data.Either (Either(..))
 import Data.Foldable (class Foldable, foldl)
 import Data.List (List(..), manyRec)
 import Data.List.NonEmpty (NonEmptyList(..))
 import Data.List.NonEmpty as NEL
 import Data.Maybe (Maybe(..))
 import Data.NonEmpty ((:|))
-import Text.Parsing.StringParser (Parser(..), fail)
-
--- | Read ahead without consuming input.
-lookAhead :: forall a. Parser a -> Parser a
-lookAhead (Parser p) = Parser \s ->
-  case p s of
-    Right { result } -> Right { result, suffix: s }
-    left -> left
+import Text.Parsing.StringParser (Parser, fail)
 
 -- | Match zero or more times.
 many :: forall a. Parser a -> Parser (List a)

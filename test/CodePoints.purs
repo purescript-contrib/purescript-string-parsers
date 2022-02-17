@@ -15,7 +15,7 @@ import Data.Unfoldable (replicate)
 import Effect (Effect)
 import Effect.Class.Console (log)
 import Test.Assert (assert', assert)
-import Text.Parsing.StringParser (Parser, runParser, try)
+import Text.Parsing.StringParser (ParseError, Parser(..), PosString, runParser, try)
 import Text.Parsing.StringParser.CodePoints (anyDigit, char, eof, string, anyChar, regex)
 import Text.Parsing.StringParser.Combinators (many1, endBy1, sepBy1, optionMaybe, many, manyTill, many1Till, chainl, fix, between)
 import Text.Parsing.StringParser.Expr (Assoc(..), Operator(..), buildExprParser)
@@ -59,6 +59,9 @@ tryTest :: Parser String
 tryTest =
   try (string "aa" <> string "bb") <|>
     (string "aa" <> string "cc")
+
+testParser :: forall a. Parser a -> String -> Either ParseError { result :: a, suffix :: PosString }
+testParser (Parser p) s = p { substr: s, posFromStart: 0 }
 
 canParse :: forall a. Parser a -> String -> Boolean
 canParse p input = isRight $ runParser p input

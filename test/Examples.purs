@@ -8,9 +8,9 @@ import Data.Foldable (fold, foldl, sum)
 import Data.List.Types (NonEmptyList)
 import Effect (Effect)
 import Effect.Console (log, logShow)
-import Text.Parsing.StringParser (Parser, fail, runParser, unParser)
+import Text.Parsing.StringParser (Parser, fail, lookAhead, runParser, unParser)
 import Text.Parsing.StringParser.CodePoints (anyChar, char, eof, regex, skipSpaces, string)
-import Text.Parsing.StringParser.Combinators (between, endBy1, lookAhead, many, many1, sepBy1, (<?>))
+import Text.Parsing.StringParser.Combinators (between, endBy1, many, many1, sepBy1, (<?>))
 
 -- Serves only to make this file runnable
 main :: Effect Unit
@@ -234,7 +234,7 @@ doBoth parserName parser content = do
 doUnParser :: forall a. Show a => String -> Parser a -> String -> Effect Unit
 doUnParser parserName parser content = do
   log $ "(unParser) Parsing content with '" <> parserName <> "'"
-  case unParser parser { str: content, pos: 0 } of
+  case unParser parser { substr: content, posFromStart: 0 } of
     Left rec -> log $ "Position: " <> show rec.pos
       <>
         "\n\

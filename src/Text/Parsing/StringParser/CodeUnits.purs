@@ -42,15 +42,15 @@ import Text.Parsing.StringParser.Combinators (many, (<?>))
 eof :: Parser Unit
 eof = Parser \s ->
   case s of
-    { str, pos } | pos < SCU.length str -> Left { pos, error: "Expected EOF" }
+    { substr, posFromStart } | 0 < SCU.length substr -> Left { pos: posFromStart, error: "Expected EOF" }
     _ -> Right { result: unit, suffix: s }
 
 -- | Match any character.
 anyChar :: Parser Char
-anyChar = Parser \{ str, pos } ->
-  case charAt pos str of
-    Just chr -> Right { result: chr, suffix: { str, pos: pos + 1 } }
-    Nothing -> Left { pos, error: "Unexpected EOF" }
+anyChar = Parser \{ substr, posFromStart } ->
+  case charAt 0 substr of
+    Just chr -> Right { result: chr, suffix: { substr: SCU.drop 1 substr, posFromStart: posFromStart + 1 } }
+    Nothing -> Left { pos: posFromStart, error: "Unexpected EOF" }
 
 -- | Match any digit.
 anyDigit :: Parser Char
@@ -63,8 +63,8 @@ anyDigit = try do
 string :: String -> Parser String
 string nt = Parser \s ->
   case s of
-    { str, pos } | SCU.indexOf' (Pattern nt) pos str == Just pos -> Right { result: nt, suffix: { str, pos: pos + SCU.length nt } }
-    { pos } -> Left { pos, error: "Expected '" <> nt <> "'." }
+    { substr, posFromStart } | SCU.indexOf (Pattern nt) substr == Just 0 -> Right { result: nt, suffix: { substr: SCU.drop (SCU.length nt) substr, posFromStart: posFromStart + SCU.length nt } }
+    { posFromStart } -> Left { pos: posFromStart, error: "Expected '" <> nt <> "'." }
 
 -- | Match a character satisfying the given predicate.
 satisfy :: (Char -> Boolean) -> Parser Char
@@ -130,10 +130,9 @@ regex pat =
   pattern = "^(" <> pat <> ")"
 
   matchRegex :: Regex.Regex -> Parser String
-  matchRegex r = Parser \{ str, pos } -> do
-    let remainder = SCU.drop pos str
-    case NEA.head <$> Regex.match r remainder of
+  matchRegex r = Parser \{ substr, posFromStart } -> do
+    case NEA.head <$> Regex.match r substr of
       Just (Just matched) ->
-        Right { result: matched, suffix: { str, pos: pos + SCU.length matched } }
+        Right { result: matched, suffix: { substr: SCU.drop (SCU.length matched) substr, posFromStart: posFromStart + SCU.length matched } }
       _ ->
-        Left { pos, error: "no match" }
+        Left { pos: posFromStart, error: "no match" }
