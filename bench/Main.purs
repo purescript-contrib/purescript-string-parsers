@@ -45,7 +45,7 @@ parse23RegexPoints :: Parser (List String)
 parse23RegexPoints = manyRec $ StringParser.CodePoints.regex """\d\d"""
 
 parse23RegexUnits :: Parser (List String)
-parse23RegexUnits = manyRec $ StringParser.CodeUnits.string """\d\d"""
+parse23RegexUnits = manyRec $ StringParser.CodeUnits.regex """\d\d"""
 
 main :: Effect Unit
 main = do

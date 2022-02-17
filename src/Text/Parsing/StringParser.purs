@@ -9,7 +9,6 @@ import Control.MonadPlus (class MonadPlus, class MonadZero, class Alternative)
 import Control.Monad.Rec.Class (class MonadRec, tailRecM, Step(..))
 import Control.Plus (class Plus, class Alt)
 import Control.Lazy (class Lazy)
-import Data.Bifunctor (lmap)
 import Data.Either (Either(..))
 
 -- | A position in an input string.
