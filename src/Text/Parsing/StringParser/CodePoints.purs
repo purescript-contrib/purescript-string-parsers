@@ -37,6 +37,7 @@ import Data.String.Regex as Regex
 import Data.String.Regex.Flags (noFlags)
 import Text.Parsing.StringParser (Parser(..), try, fail)
 import Text.Parsing.StringParser.Combinators (many, (<?>))
+import Text.Parsing.StringParser.CodeUnits as CodeUnitsParser
 
 -- | Match the end of the file.
 eof :: Parser Unit
@@ -59,7 +60,7 @@ anyChar = Parser \{ substr, posFromStart } ->
 -- | Match any digit.
 anyDigit :: Parser Char
 anyDigit = try do
-  c <- anyChar
+  c <- CodeUnitsParser.anyChar
   if c >= '0' && c <= '9' then pure c
   else fail $ "Character " <> show c <> " is not a digit"
 
@@ -105,14 +106,14 @@ noneOf = satisfy <<< flip notElem
 -- | Match any lower case character.
 lowerCaseChar :: Parser Char
 lowerCaseChar = try do
-  c <- anyChar
+  c <- CodeUnitsParser.anyChar
   if toCharCode c `elem` (97 .. 122) then pure c
   else fail $ "Expected a lower case character but found " <> show c
 
 -- | Match any upper case character.
 upperCaseChar :: Parser Char
 upperCaseChar = try do
-  c <- anyChar
+  c <- CodeUnitsParser.anyChar
   if toCharCode c `elem` (65 .. 90) then pure c
   else fail $ "Expected an upper case character but found " <> show c
 
