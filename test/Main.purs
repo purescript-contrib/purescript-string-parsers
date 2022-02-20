@@ -6,10 +6,14 @@ import Effect (Effect)
 import Effect.Console (log)
 import Test.CodePoints (testCodePoints)
 import Test.CodeUnits (testCodeUnits)
+import Test.BasicSpecs (runTestCases)
 
 main :: Effect Unit
 main = do
-  log "Testing CodePoint parsing\n"
+  log "Running basic spec test cases\n"
+  runTestCases
+
+  log "\n\nTesting CodePoint parsing\n"
   testCodePoints
 
   log "\n\nTesting CodeUnit parsing\n"

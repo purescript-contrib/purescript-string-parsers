@@ -103,13 +103,13 @@ sepEndBy1 p sep = do
       pure (cons' a as)
   ) <|> pure (NEL.singleton a)
 
--- | Parse one or more separated values, ending with a separator.
-endBy1 :: forall a sep. Parser a -> Parser sep -> Parser (NonEmptyList a)
-endBy1 p sep = many1 $ p <* sep
-
 -- | Parse zero or more separated values, ending with a separator.
 endBy :: forall a sep. Parser a -> Parser sep -> Parser (List a)
 endBy p sep = many $ p <* sep
+
+-- | Parse one or more separated values, ending with a separator.
+endBy1 :: forall a sep. Parser a -> Parser sep -> Parser (NonEmptyList a)
+endBy1 p sep = many1 $ p <* sep
 
 -- | Parse zero or more values separated by a right-associative operator.
 chainr :: forall a. Parser a -> Parser (a -> a -> a) -> a -> Parser a
@@ -125,6 +125,8 @@ chainl1 p f = do
   a <- p
   chainl1' p f a
 
+-- TODO: this description is not different from the above
+-- TODO: should we even expose this function?
 -- | Parse one or more values separated by a left-associative operator.
 chainl1' :: forall a. Parser a -> Parser (a -> a -> a) -> a -> Parser a
 chainl1' p f a =
@@ -140,6 +142,8 @@ chainr1 p f = do
   a <- p
   chainr1' p f a
 
+-- TODO: this description is not different from the above
+-- TODO: should we even expose this function?
 -- | Parse one or more values separated by a right-associative operator.
 chainr1' :: forall a. Parser a -> Parser (a -> a -> a) -> a -> Parser a
 chainr1' p f a =
