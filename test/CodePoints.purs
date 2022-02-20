@@ -72,6 +72,12 @@ parseFail p input = isLeft $ runParser p input
 expectResult :: forall a. Eq a => a -> Parser a -> String -> Boolean
 expectResult res p input = runParser p input == Right res
 
+expectPosition :: forall a. Int -> Parser a -> String -> Boolean
+expectPosition pos p input =
+  case testParser p input of
+    Right r -> r.suffix.posFromStart == pos
+    Left _ -> false
+
 testCodePoints :: Effect Unit
 testCodePoints = do
 
@@ -113,6 +119,8 @@ testCodePoints = do
   assert $ expectResult "\x458CA" (string "\x458CA" <* char ']' <* eof) "\x458CA]"
   assert $ expectResult "\x458CA" (string "\x458CA" <* string ")" <* eof) "\x458CA)"
   assert $ expectResult '\xEEE2' (char '\xEEE2' <* eof) "\xEEE2"
+  assert $ expectPosition 1 anyChar "\xEEE2"
+  assert $ expectPosition 2 anyChar "\x458CA"
 
   log "Running overflow tests (may take a while)"
 

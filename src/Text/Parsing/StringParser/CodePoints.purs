@@ -51,7 +51,7 @@ anyChar :: Parser Char
 anyChar = Parser \{ substr, posFromStart } ->
   case SCP.codePointAt 0 substr of
     Just cp -> case toChar cp of
-      Just chr -> Right { result: chr, suffix: { substr: SCP.drop 1 substr, posFromStart: posFromStart + 1 } }
+      Just chr -> Right { result: chr, suffix: { substr: SCP.drop 1 substr, posFromStart: posFromStart + SCU.length (SCP.singleton cp) } }
       Nothing -> Left { pos: posFromStart, error: "CodePoint " <> show cp <> " is not a character" }
     Nothing -> Left { pos: posFromStart, error: "Unexpected EOF" }
   where
