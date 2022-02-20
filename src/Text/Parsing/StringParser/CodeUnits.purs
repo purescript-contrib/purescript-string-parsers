@@ -32,7 +32,6 @@ import Data.Foldable (class Foldable, foldMap, elem, notElem)
 import Data.Maybe (Maybe(..))
 import Data.String.CodeUnits (charAt, singleton)
 import Data.String.CodeUnits as SCU
-import Data.String.Pattern (Pattern(..))
 import Data.String.Regex as Regex
 import Data.String.Regex.Flags (noFlags)
 import Text.Parsing.StringParser (Parser(..), try, fail)
@@ -61,10 +60,13 @@ anyDigit = try do
 
 -- | Match the specified string.
 string :: String -> Parser String
-string nt = Parser \s ->
-  case s of
-    { substr, posFromStart } | SCU.indexOf (Pattern nt) substr == Just 0 -> Right { result: nt, suffix: { substr: SCU.drop (SCU.length nt) substr, posFromStart: posFromStart + SCU.length nt } }
-    { posFromStart } -> Left { pos: posFromStart, error: "Expected '" <> nt <> "'." }
+string pattern = Parser \{ substr, posFromStart } ->
+  let
+    length = SCU.length pattern
+    { before, after } = SCU.splitAt length substr
+  in
+    if before == pattern then Right { result: pattern, suffix: { substr: after, posFromStart: posFromStart + length } }
+    else Left { pos: posFromStart, error: "Expected '" <> pattern <> "'." }
 
 -- | Match a character satisfying the given predicate.
 satisfy :: (Char -> Boolean) -> Parser Char
