@@ -31,9 +31,8 @@ import Data.Either (Either(..))
 import Data.Enum (fromEnum)
 import Data.Foldable (class Foldable, foldMap, elem, notElem)
 import Data.Maybe (Maybe(..))
-import Data.String.CodePoints (codePointAt, drop, indexOf, length)
-import Data.String.CodeUnits (singleton)
-import Data.String.Pattern (Pattern(..))
+import Data.String.CodePoints as SCP
+import Data.String.CodeUnits as SCU
 import Data.String.Regex as Regex
 import Data.String.Regex.Flags (noFlags)
 import Text.Parsing.StringParser (Parser(..), try, fail)
@@ -43,15 +42,15 @@ import Text.Parsing.StringParser.Combinators (many, (<?>))
 eof :: Parser Unit
 eof = Parser \s ->
   case s of
-    { substr, posFromStart } | 0 < length substr -> Left { pos: posFromStart, error: "Expected EOF" }
+    { substr, posFromStart } | 0 < SCU.length substr -> Left { pos: posFromStart, error: "Expected EOF" }
     _ -> Right { result: unit, suffix: s }
 
 -- | Match any character.
 anyChar :: Parser Char
 anyChar = Parser \{ substr, posFromStart } ->
-  case codePointAt 0 substr of
+  case SCP.codePointAt 0 substr of
     Just cp -> case toChar cp of
-      Just chr -> Right { result: chr, suffix: { substr: drop 1 substr, posFromStart: posFromStart + 1 } }
+      Just chr -> Right { result: chr, suffix: { substr: SCP.drop 1 substr, posFromStart: posFromStart + 1 } }
       Nothing -> Left { pos: posFromStart, error: "CodePoint " <> show cp <> " is not a character" }
     Nothing -> Left { pos: posFromStart, error: "Unexpected EOF" }
   where
@@ -66,10 +65,13 @@ anyDigit = try do
 
 -- | Match the specified string.
 string :: String -> Parser String
-string nt = Parser \s ->
-  case s of
-    { substr, posFromStart } | indexOf (Pattern nt) substr == Just 0 -> Right { result: nt, suffix: { substr: drop (length nt) substr, posFromStart: posFromStart + length nt } }
-    { posFromStart } -> Left { pos: posFromStart, error: "Expected '" <> nt <> "'." }
+string pattern = Parser \{ substr, posFromStart } ->
+  let
+    length = SCU.length pattern
+    { before, after } = SCU.splitAt length substr
+  in
+    if before == pattern then Right { result: pattern, suffix: { substr: after, posFromStart: posFromStart + length } }
+    else Left { pos: posFromStart, error: "Expected '" <> pattern <> "'." }
 
 -- | Match a character satisfying the given predicate.
 satisfy :: (Char -> Boolean) -> Parser Char
@@ -86,7 +88,7 @@ char c = satisfy (_ == c) <?> "Could not match character " <> show c
 whiteSpace :: Parser String
 whiteSpace = do
   cs <- many (satisfy \c -> c == '\n' || c == '\r' || c == ' ' || c == '\t')
-  pure (foldMap singleton cs)
+  pure (foldMap SCU.singleton cs)
 
 -- | Skip many whitespace characters.
 skipSpaces :: Parser Unit
@@ -138,6 +140,6 @@ regex pat =
   matchRegex r = Parser \{ substr, posFromStart } -> do
     case NEA.head <$> Regex.match r substr of
       Just (Just matched) ->
-        Right { result: matched, suffix: { substr: drop (length matched) substr, posFromStart: posFromStart + length matched } }
+        Right { result: matched, suffix: { substr: SCU.drop (SCU.length matched) substr, posFromStart: posFromStart + SCU.length matched } }
       _ ->
         Left { pos: posFromStart, error: "no match" }
