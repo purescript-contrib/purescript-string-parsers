@@ -81,8 +81,7 @@ testCases =
     }
   , { name: "sepEndBy"
     , parser: mkAnyParser $ sepEndBy anyLetter (char ';')
-    -- TODO: ";" should be parsed successfully
-    , inputs: { successes: [ "", "a", "a;b", "a;b;c", "a;" ], failures: [ ";", ";a", "ab", "a;ab" ] }
+    , inputs: { successes: [ "", ";", "a", "a;b", "a;b;c", "a;" ], failures: [ ";a", "ab", "a;ab" ] }
     }
   , { name: "sepEndBy1"
     , parser: mkAnyParser $ sepEndBy1 anyLetter (char ';')
@@ -90,8 +89,7 @@ testCases =
     }
   , { name: "endBy"
     , parser: mkAnyParser $ endBy anyLetter (char ';')
-    -- TODO: ";" should be parsed successfully
-    , inputs: { successes: [ "", "a;", "a;b;", "a;b;c;" ], failures: [ "a", ";", ";a", "ab", "a;b", "a;b;c" ] }
+    , inputs: { successes: [ ";", "a;", "a;b;", "a;b;c;" ], failures: [ "", "a", ";a", "ab", "a;b", "a;b;c" ] }
     }
   , { name: "endBy1"
     , parser: mkAnyParser $ endBy1 anyLetter (char ';')

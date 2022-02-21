@@ -89,7 +89,7 @@ sepBy1 p sep = do
 
 -- | Parse zero or more separated values, optionally ending with a separator.
 sepEndBy :: forall a sep. Parser a -> Parser sep -> Parser (List a)
-sepEndBy p sep = map NEL.toList (sepEndBy1 p sep) <|> pure Nil
+sepEndBy p sep = (sepEndBy1 p sep <#> NEL.toList) <|> (sep $> Nil) <|> pure Nil
 
 -- | Parse one or more separated values, optionally ending with a separator.
 sepEndBy1 :: forall a sep. Parser a -> Parser sep -> Parser (NonEmptyList a)
@@ -103,7 +103,7 @@ sepEndBy1 p sep = do
 
 -- | Parse zero or more separated values, ending with a separator.
 endBy :: forall a sep. Parser a -> Parser sep -> Parser (List a)
-endBy p sep = many $ p <* sep
+endBy p sep = (endBy1 p sep <#> NEL.toList) <|> (sep $> Nil)
 
 -- | Parse one or more separated values, ending with a separator.
 endBy1 :: forall a sep. Parser a -> Parser sep -> Parser (NonEmptyList a)
