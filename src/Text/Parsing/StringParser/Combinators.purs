@@ -18,9 +18,7 @@ module Text.Parsing.StringParser.Combinators
   , chainr
   , chainl
   , chainl1
-  , chainl1'
   , chainr1
-  , chainr1'
   , choice
   , manyTill
   , many1Till
@@ -125,9 +123,6 @@ chainl1 p f = do
   a <- p
   chainl1' p f a
 
--- TODO: this description is not different from the above
--- TODO: should we even expose this function?
--- | Parse one or more values separated by a left-associative operator.
 chainl1' :: forall a. Parser a -> Parser (a -> a -> a) -> a -> Parser a
 chainl1' p f a =
   ( do
@@ -142,9 +137,6 @@ chainr1 p f = do
   a <- p
   chainr1' p f a
 
--- TODO: this description is not different from the above
--- TODO: should we even expose this function?
--- | Parse one or more values separated by a right-associative operator.
 chainr1' :: forall a. Parser a -> Parser (a -> a -> a) -> a -> Parser a
 chainr1' p f a =
   ( do
