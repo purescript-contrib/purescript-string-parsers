@@ -17,9 +17,7 @@ module Text.Parsing.StringParser.Combinators
   , chainr
   , chainl
   , chainl1
-  , chainl1'
   , chainr1
-  , chainr1'
   , choice
   , manyTill
   , many1Till
@@ -82,7 +80,7 @@ sepBy1 p sep = do
 
 -- | Parse zero or more separated values, optionally ending with a separator.
 sepEndBy :: forall a sep. Parser a -> Parser sep -> Parser (List a)
-sepEndBy p sep = map NEL.toList (sepEndBy1 p sep) <|> pure Nil
+sepEndBy p sep = (sepEndBy1 p sep <#> NEL.toList) <|> (sep $> Nil) <|> pure Nil
 
 -- | Parse one or more separated values, optionally ending with a separator.
 sepEndBy1 :: forall a sep. Parser a -> Parser sep -> Parser (NonEmptyList a)
@@ -94,13 +92,13 @@ sepEndBy1 p sep = do
       pure (cons' a as)
   ) <|> pure (NEL.singleton a)
 
+-- | Parse zero or more separated values, ending with a separator.
+endBy :: forall a sep. Parser a -> Parser sep -> Parser (List a)
+endBy p sep = (endBy1 p sep <#> NEL.toList) <|> (sep $> Nil)
+
 -- | Parse one or more separated values, ending with a separator.
 endBy1 :: forall a sep. Parser a -> Parser sep -> Parser (NonEmptyList a)
 endBy1 p sep = many1 $ p <* sep
-
--- | Parse zero or more separated values, ending with a separator.
-endBy :: forall a sep. Parser a -> Parser sep -> Parser (List a)
-endBy p sep = many $ p <* sep
 
 -- | Parse zero or more values separated by a right-associative operator.
 chainr :: forall a. Parser a -> Parser (a -> a -> a) -> a -> Parser a
@@ -116,7 +114,6 @@ chainl1 p f = do
   a <- p
   chainl1' p f a
 
--- | Parse one or more values separated by a left-associative operator.
 chainl1' :: forall a. Parser a -> Parser (a -> a -> a) -> a -> Parser a
 chainl1' p f a =
   ( do
@@ -131,7 +128,6 @@ chainr1 p f = do
   a <- p
   chainr1' p f a
 
--- | Parse one or more values separated by a right-associative operator.
 chainr1' :: forall a. Parser a -> Parser (a -> a -> a) -> a -> Parser a
 chainr1' p f a =
   ( do

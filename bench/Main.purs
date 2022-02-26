@@ -19,14 +19,17 @@ import Text.Parsing.StringParser (Parser, runParser)
 import Text.Parsing.StringParser.CodePoints as StringParser.CodePoints
 import Text.Parsing.StringParser.CodeUnits as StringParser.CodeUnits
 
-string23 :: String
-string23 = "23"
-
-string23_2 :: String
-string23_2 = fold $ replicate 2 string23
+string23_100 :: String
+string23_100 = fold $ replicate 100 "23"
 
 string23_10000 :: String
-string23_10000 = fold $ replicate 10000 string23
+string23_10000 = fold $ replicate 100 string23_100
+
+parse23AnyCharPoints :: Parser (List Char)
+parse23AnyCharPoints = manyRec StringParser.CodePoints.anyChar
+
+parse23AnyCharUnits :: Parser (List Char)
+parse23AnyCharUnits = manyRec StringParser.CodeUnits.anyChar
 
 parse23DigitPoints :: Parser (List Char)
 parse23DigitPoints = manyRec StringParser.CodePoints.anyDigit
@@ -48,10 +51,13 @@ parse23RegexUnits = manyRec $ StringParser.CodeUnits.regex """\d\d"""
 
 main :: Effect Unit
 main = do
-  -- log $ show $ runParser string23_2 parse23
-  -- log $ show $ Regex.match pattern23 string23_2
-  -- log $ show $ runParser stringSkidoo_2 parseSkidoo
-  -- log $ show $ Regex.match patternSkidoo stringSkidoo_2
+  log "StringParser.runParser parse23AnyCharPoints"
+  benchWith 20
+    $ \_ -> runParser parse23AnyCharPoints string23_10000
+  log "StringParser.runParser parse23AnyCharUnits"
+  benchWith 200
+    $ \_ -> runParser parse23AnyCharUnits string23_10000
+
   log "StringParser.runParser parse23DigitPoints"
   benchWith 200
     $ \_ -> runParser parse23DigitPoints string23_10000
