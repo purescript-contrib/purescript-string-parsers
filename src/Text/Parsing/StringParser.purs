@@ -100,7 +100,6 @@ fail error = Parser \{ posFromStart } -> Left { pos: posFromStart, error }
 -- |
 -- | `try p` backtracks even if input was consumed.
 try :: forall a. Parser a -> Parser a
--- try (Parser p) = Parser \(s@{ pos }) -> lmap (_ { pos = pos }) (p s)
 try (Parser p) = Parser \s ->
   case p s of
     Left { error } -> Left { pos: s.posFromStart, error }
