@@ -17,6 +17,7 @@
   , "psci-support"
   , "strings"
   , "tailrec"
+  , "transformers"
   , "unfoldable"
   ]
 , packages = ./packages.dhall
