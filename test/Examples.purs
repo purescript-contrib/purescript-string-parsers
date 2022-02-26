@@ -234,7 +234,7 @@ doBoth parserName parser content = do
 doUnParser :: forall a. Show a => String -> Parser a -> String -> Effect Unit
 doUnParser parserName parser content = do
   log $ "(unParser) Parsing content with '" <> parserName <> "'"
-  case unParser parser { substr: content, posFromStart: 0 } of
+  case unParser parser { substring: content, position: 0 } of
     Left rec -> log $ "Position: " <> show rec.pos
       <>
         "\n\

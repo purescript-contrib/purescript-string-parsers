@@ -41,15 +41,15 @@ import Text.Parsing.StringParser.Combinators (many, (<?>))
 eof :: Parser Unit
 eof = Parser \s ->
   case s of
-    { substr, posFromStart } | 0 < SCU.length substr -> Left { pos: posFromStart, error: "Expected EOF" }
+    { substring, position } | 0 < SCU.length substring -> Left { pos: position, error: "Expected EOF" }
     _ -> Right { result: unit, suffix: s }
 
 -- | Match any character.
 anyChar :: Parser Char
-anyChar = Parser \{ substr, posFromStart } ->
-  case charAt 0 substr of
-    Just chr -> Right { result: chr, suffix: { substr: SCU.drop 1 substr, posFromStart: posFromStart + 1 } }
-    Nothing -> Left { pos: posFromStart, error: "Unexpected EOF" }
+anyChar = Parser \{ substring, position } ->
+  case charAt 0 substring of
+    Just chr -> Right { result: chr, suffix: { substring: SCU.drop 1 substring, position: position + 1 } }
+    Nothing -> Left { pos: position, error: "Unexpected EOF" }
 
 -- | Match any digit.
 anyDigit :: Parser Char
@@ -60,13 +60,13 @@ anyDigit = try do
 
 -- | Match the specified string.
 string :: String -> Parser String
-string pattern = Parser \{ substr, posFromStart } ->
+string pattern = Parser \{ substring, position } ->
   let
     length = SCU.length pattern
-    { before, after } = SCU.splitAt length substr
+    { before, after } = SCU.splitAt length substring
   in
-    if before == pattern then Right { result: pattern, suffix: { substr: after, posFromStart: posFromStart + length } }
-    else Left { pos: posFromStart, error: "Expected '" <> pattern <> "'." }
+    if before == pattern then Right { result: pattern, suffix: { substring: after, position: position + length } }
+    else Left { pos: position, error: "Expected '" <> pattern <> "'." }
 
 -- | Match a character satisfying the given predicate.
 satisfy :: (Char -> Boolean) -> Parser Char
@@ -132,9 +132,9 @@ regex pat =
   pattern = "^(" <> pat <> ")"
 
   matchRegex :: Regex.Regex -> Parser String
-  matchRegex r = Parser \{ substr, posFromStart } -> do
-    case NEA.head <$> Regex.match r substr of
+  matchRegex r = Parser \{ substring, position } -> do
+    case NEA.head <$> Regex.match r substring of
       Just (Just matched) ->
-        Right { result: matched, suffix: { substr: SCU.drop (SCU.length matched) substr, posFromStart: posFromStart + SCU.length matched } }
+        Right { result: matched, suffix: { substring: SCU.drop (SCU.length matched) substring, position: position + SCU.length matched } }
       _ ->
-        Left { pos: posFromStart, error: "no match" }
+        Left { pos: position, error: "no match" }

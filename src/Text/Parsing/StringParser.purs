@@ -17,11 +17,11 @@ type Pos = Int
 -- | Strings are represented as a substring with an index from the
 -- | start of the string.
 -- |
--- | `{ str: s, pos: n }` is interpreted as the substring `s`
+-- | `{ substring: s, position: n }` is interpreted as the substring `s`
 -- | starting at index n of the original string.
 -- |
--- | The pos is only kept for error messaging.
-type PosString = { substr :: String, posFromStart :: Pos }
+-- | The position is only kept for error messaging.
+type PosString = { substring :: String, position :: Pos }
 
 -- | The type of parsing errors.
 type ParseError = { error :: String, pos :: Pos }
@@ -41,7 +41,7 @@ unParser (Parser p) = p
 -- | Run a parser for an input string. See also `printParserError`
 -- | and `unParser` for more flexible usages.
 runParser :: forall a. Parser a -> String -> Either ParseError a
-runParser (Parser p) s = map _.result (p { substr: s, posFromStart: 0 })
+runParser (Parser p) s = map _.result (p { substring: s, position: 0 })
 
 -- | Prints a ParseError's the error message and the position of the error.
 printParserError :: ParseError -> String
@@ -63,7 +63,7 @@ instance altParser :: Alt Parser where
   alt (Parser p1) (Parser p2) = Parser \s ->
     case p1 s of
       Left { error, pos }
-        | s.posFromStart == pos -> p2 s
+        | s.position == pos -> p2 s
         | otherwise -> Left { error, pos }
       right -> right
 
@@ -94,7 +94,7 @@ instance lazyParser :: Lazy (Parser a) where
 
 -- | Fail with the specified message.
 fail :: forall a. String -> Parser a
-fail error = Parser \{ posFromStart } -> Left { pos: posFromStart, error }
+fail error = Parser \{ position } -> Left { pos: position, error }
 
 -- | In case of error, the default behavior is to backtrack if no input was consumed.
 -- |
@@ -102,7 +102,7 @@ fail error = Parser \{ posFromStart } -> Left { pos: posFromStart, error }
 try :: forall a. Parser a -> Parser a
 try (Parser p) = Parser \s ->
   case p s of
-    Left { error } -> Left { pos: s.posFromStart, error }
+    Left { error } -> Left { pos: s.position, error }
     right -> right
 
 instance semigroupParser :: Semigroup a => Semigroup (Parser a) where

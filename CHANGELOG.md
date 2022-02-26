@@ -5,11 +5,11 @@ Notable changes to this project are documented in this file. The format is based
 ## [Unreleased]
 
 Breaking changes:
+- Issue #77: Fix CodePoint parser quadratic performance (#83 by @chtenb). The parser now tracks the remaining unparsed substring. This change is breaking, but will trigger compile errors in all places where this definition is used.
 
 New features:
 
 Bugfixes:
-- Issue #77: Fix CodePoint parser quadratic performance (#83 by @chtenb)
 - Do not export `chainl'` and `chainr'` helper functions (#84 by @chtenb)
 - Fix semantics of endBy and sepEndBy parser combinators (#84 by @chtenb)
 - Issue #69: Fix regex parser to always wrap pattern inside `^(..)` (#80 by @chtenb)
