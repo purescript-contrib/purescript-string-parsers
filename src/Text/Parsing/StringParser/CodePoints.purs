@@ -43,7 +43,7 @@ import Text.Parsing.StringParser.CodeUnits as CodeUnitsParser
 eof :: Parser Unit
 eof = Parser \s ->
   case s of
-    { substr, posFromStart } | 0 < SCU.length substr -> Left { pos: posFromStart, error: "Expected EOF" }
+    { substr, posFromStart } | 0 < SCP.length substr -> Left { pos: posFromStart, error: "Expected EOF" }
     _ -> Right { result: unit, suffix: s }
 
 -- | Match any character.
@@ -51,7 +51,7 @@ anyChar :: Parser Char
 anyChar = Parser \{ substr, posFromStart } ->
   case SCP.codePointAt 0 substr of
     Just cp -> case toChar cp of
-      Just chr -> Right { result: chr, suffix: { substr: SCP.drop 1 substr, posFromStart: posFromStart + SCU.length (SCP.singleton cp) } }
+      Just chr -> Right { result: chr, suffix: { substr: SCP.drop 1 substr, posFromStart: posFromStart + 1 } }
       Nothing -> Left { pos: posFromStart, error: "CodePoint " <> show cp <> " is not a character" }
     Nothing -> Left { pos: posFromStart, error: "Unexpected EOF" }
   where
@@ -68,8 +68,8 @@ anyDigit = try do
 string :: String -> Parser String
 string pattern = Parser \{ substr, posFromStart } ->
   let
-    length = SCU.length pattern
-    { before, after } = SCU.splitAt length substr
+    length = SCP.length pattern
+    { before, after } = SCP.splitAt length substr
   in
     if before == pattern then Right { result: pattern, suffix: { substr: after, posFromStart: posFromStart + length } }
     else Left { pos: posFromStart, error: "Expected '" <> pattern <> "'." }
@@ -141,6 +141,6 @@ regex pat =
   matchRegex r = Parser \{ substr, posFromStart } -> do
     case NEA.head <$> Regex.match r substr of
       Just (Just matched) ->
-        Right { result: matched, suffix: { substr: SCU.drop (SCU.length matched) substr, posFromStart: posFromStart + SCU.length matched } }
+        Right { result: matched, suffix: { substr: SCP.drop (SCP.length matched) substr, posFromStart: posFromStart + SCP.length matched } }
       _ ->
         Left { pos: posFromStart, error: "no match" }

@@ -106,13 +106,6 @@ try (Parser p) = Parser \s ->
     Left { error } -> Left { pos: s.posFromStart, error }
     right -> right
 
--- | Read ahead without consuming input.
-lookAhead :: forall a. Parser a -> Parser a
-lookAhead (Parser p) = Parser \s ->
-  case p s of
-    Right { result } -> Right { result, suffix: s }
-    left -> left
-
 instance semigroupParser :: Semigroup a => Semigroup (Parser a) where
   append = lift2 append
 
