@@ -5,12 +5,12 @@ Notable changes to this project are documented in this file. The format is based
 ## [Unreleased]
 
 Breaking changes:
+- Fix semantics of endBy and sepEndBy parser combinators (#84 by @chtenb)
 
 New features:
 
 Bugfixes:
 - Do not export `chainl'` and `chainr'` helper functions (#84 by @chtenb)
-- Fix semantics of endBy and sepEndBy parser combinators (#84 by @chtenb)
 - Issue #69: Fix regex parser to always wrap pattern inside `^(..)` (#80 by @chtenb)
 
 Other improvements:
