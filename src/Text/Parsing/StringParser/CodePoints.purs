@@ -6,10 +6,13 @@
 module Text.Parsing.StringParser.CodePoints
   ( eof
   , anyChar
+  , anyCodePoint
   , anyDigit
   , string
   , satisfy
+  , satisfyCodePoint
   , char
+  , codePoint
   , whiteSpace
   , skipSpaces
   , oneOf
@@ -31,13 +34,14 @@ import Data.Either (Either(..))
 import Data.Enum (fromEnum)
 import Data.Foldable (class Foldable, foldMap, elem, notElem)
 import Data.Maybe (Maybe(..))
+import Data.String (CodePoint)
 import Data.String.CodePoints as SCP
 import Data.String.CodeUnits as SCU
 import Data.String.Regex as Regex
 import Data.String.Regex.Flags (noFlags)
 import Text.Parsing.StringParser (Parser(..), try, fail)
-import Text.Parsing.StringParser.Combinators (many, (<?>))
 import Text.Parsing.StringParser.CodeUnits as CodeUnitsParser
+import Text.Parsing.StringParser.Combinators (many, (<?>))
 
 -- | Match the end of the file.
 eof :: Parser Unit
@@ -46,16 +50,22 @@ eof = Parser \s ->
     { substring, position } | 0 < SCP.length substring -> Left { pos: position, error: "Expected EOF" }
     _ -> Right { result: unit, suffix: s }
 
--- | Match any character.
+-- | Match any character from the Basic Multilingual Plane.
 anyChar :: Parser Char
-anyChar = Parser \{ substring, position } ->
-  case SCP.codePointAt 0 substring of
-    Just cp -> case toChar cp of
-      Just chr -> Right { result: chr, suffix: { substring: SCP.drop 1 substring, position: position + 1 } }
-      Nothing -> Left { pos: position, error: "CodePoint " <> show cp <> " is not a character" }
-    Nothing -> Left { pos: position, error: "Unexpected EOF" }
+anyChar = do
+  cp <- anyCodePoint
+  case toChar cp of
+    Just chr -> pure chr
+    Nothing -> fail $ "Code point " <> show cp <> " is not a character"
   where
   toChar = fromCharCode <<< fromEnum
+
+-- | Match any code point.
+anyCodePoint :: Parser CodePoint
+anyCodePoint = Parser \{ substring, position } ->
+  case SCP.codePointAt 0 substring of
+    Just cp -> Right { result: cp, suffix: { substring: SCP.drop 1 substring, position: position + 1 } }
+    Nothing -> Left { pos: position, error: "Unexpected EOF" }
 
 -- | Match any digit.
 anyDigit :: Parser Char
@@ -81,9 +91,20 @@ satisfy f = try do
   if f c then pure c
   else fail $ "Character " <> show c <> " did not satisfy predicate"
 
+-- | Match a code point satisfying the given predicate.
+satisfyCodePoint :: (CodePoint -> Boolean) -> Parser CodePoint
+satisfyCodePoint f = try do
+  cp <- anyCodePoint
+  if f cp then pure cp
+  else fail $ "Code point " <> show cp <> " did not satisfy predicate"
+
 -- | Match the specified character.
 char :: Char -> Parser Char
 char c = satisfy (_ == c) <?> "Could not match character " <> show c
+
+-- | Match the specified code point.
+codePoint :: CodePoint -> Parser CodePoint
+codePoint c = satisfyCodePoint (_ == c) <?> "Could not match code point " <> show c
 
 -- | Match many whitespace characters.
 whiteSpace :: Parser String

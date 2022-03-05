@@ -2,22 +2,28 @@ module Test.BasicSpecs where
 
 import Prelude hiding (between)
 
-import Test.Utils (AnyParser(..), mkAnyParser)
 import Control.Alt ((<|>))
 import Control.Monad.Writer (Writer, execWriter, tell)
 import Data.Either (isRight)
 import Data.List (List)
 import Data.List as List
+import Data.Maybe (fromJust)
+import Data.String (CodePoint, codePointAt)
 import Data.Traversable (traverse)
 import Effect (Effect)
 import Effect.Class.Console (log)
+import Partial.Unsafe (unsafePartial)
 import Test.Assert (assert')
+import Test.Utils (AnyParser(..), mkAnyParser)
 import Text.Parsing.StringParser (Parser, runParser, try)
-import Text.Parsing.StringParser.CodePoints (anyChar, anyDigit, anyLetter, char, eof, skipSpaces, string)
+import Text.Parsing.StringParser.CodePoints (anyChar, anyCodePoint, anyDigit, anyLetter, char, codePoint, eof, skipSpaces, string)
 import Text.Parsing.StringParser.Combinators (between, chainl, chainl1, endBy, endBy1, lookAhead, many, many1, manyTill, sepBy, sepBy1, sepEndBy, sepEndBy1)
 
 type TestInputs = { successes :: Array String, failures :: Array String }
 type TestCase = { name :: String, parser :: AnyParser, inputs :: TestInputs }
+
+codePointLiteral :: String -> CodePoint
+codePointLiteral s = unsafePartial $ fromJust $ codePointAt 0 s
 
 testCases :: Array TestCase
 testCases =
@@ -25,7 +31,15 @@ testCases =
     , parser: mkAnyParser anyChar
     -- TODO: test "🙂" which should fail
     -- this is an open upstream issue https://github.com/purescript/purescript-strings/issues/153
-    , inputs: { successes: [ "a", "%" ], failures: [ "" ] }
+    , inputs: { successes: [ "a", "%" ], failures: [ "", "aa" ] }
+    }
+  , { name: "anyCodePoint"
+    , parser: mkAnyParser anyCodePoint
+    , inputs: { successes: [ "a", "%", "🙂" ], failures: [ "", "aa" ] }
+    }
+  , { name: "codePoint"
+    , parser: mkAnyParser $ codePoint $ codePointLiteral "🙂"
+    , inputs: { successes: [ "🙂" ], failures: [ "", "a", "aa" ] }
     }
   , { name: "anyLetter"
     , parser: mkAnyParser anyLetter
