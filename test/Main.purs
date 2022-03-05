@@ -13,8 +13,8 @@ main = do
   log "Running basic spec test cases\n"
   runTestCases
 
-  log "\n\nTesting CodePoint parsing\n"
-  testCodePoints
-
   log "\n\nTesting CodeUnit parsing\n"
   testCodeUnits
+
+  log "\n\nTesting CodePoint parsing\n"
+  testCodePoints

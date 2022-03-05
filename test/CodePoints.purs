@@ -15,7 +15,7 @@ import Data.Unfoldable (replicate)
 import Effect (Effect)
 import Effect.Class.Console (log)
 import Test.Assert (assert', assert)
-import Text.Parsing.StringParser (Parser, runParser, try)
+import Text.Parsing.StringParser (ParseError, Parser(..), PosString, runParser, try)
 import Text.Parsing.StringParser.CodePoints (anyDigit, char, eof, string, anyChar, regex)
 import Text.Parsing.StringParser.Combinators (many1, endBy1, sepBy1, optionMaybe, many, manyTill, many1Till, chainl, fix, between)
 import Text.Parsing.StringParser.Expr (Assoc(..), Operator(..), buildExprParser)
@@ -60,6 +60,9 @@ tryTest =
   try (string "aa" <> string "bb") <|>
     (string "aa" <> string "cc")
 
+testParser :: forall a. Parser a -> String -> Either ParseError { result :: a, suffix :: PosString }
+testParser (Parser p) s = p { substring: s, position: 0 }
+
 canParse :: forall a. Parser a -> String -> Boolean
 canParse p input = isRight $ runParser p input
 
@@ -68,6 +71,12 @@ parseFail p input = isLeft $ runParser p input
 
 expectResult :: forall a. Eq a => a -> Parser a -> String -> Boolean
 expectResult res p input = runParser p input == Right res
+
+expectPosition :: forall a. Int -> Parser a -> String -> Boolean
+expectPosition pos p input =
+  case testParser p input of
+    Right r -> r.suffix.position == pos
+    Left _ -> false
 
 testCodePoints :: Effect Unit
 testCodePoints = do
@@ -110,6 +119,8 @@ testCodePoints = do
   assert $ expectResult "\x458CA" (string "\x458CA" <* char ']' <* eof) "\x458CA]"
   assert $ expectResult "\x458CA" (string "\x458CA" <* string ")" <* eof) "\x458CA)"
   assert $ expectResult '\xEEE2' (char '\xEEE2' <* eof) "\xEEE2"
+  assert $ expectPosition 1 anyChar "\xEEE2"
+  assert $ expectPosition 1 anyChar "\x458CA"
 
   log "Running overflow tests (may take a while)"
 

@@ -31,45 +31,48 @@ import Data.Either (Either(..))
 import Data.Enum (fromEnum)
 import Data.Foldable (class Foldable, foldMap, elem, notElem)
 import Data.Maybe (Maybe(..))
-import Data.String.CodePoints (codePointAt, drop, indexOf', length)
-import Data.String.CodeUnits (singleton)
-import Data.String.Pattern (Pattern(..))
+import Data.String.CodePoints as SCP
+import Data.String.CodeUnits as SCU
 import Data.String.Regex as Regex
 import Data.String.Regex.Flags (noFlags)
 import Text.Parsing.StringParser (Parser(..), try, fail)
 import Text.Parsing.StringParser.Combinators (many, (<?>))
+import Text.Parsing.StringParser.CodeUnits as CodeUnitsParser
 
 -- | Match the end of the file.
 eof :: Parser Unit
 eof = Parser \s ->
   case s of
-    { str, pos } | pos < length str -> Left { pos, error: "Expected EOF" }
+    { substring, position } | 0 < SCP.length substring -> Left { pos: position, error: "Expected EOF" }
     _ -> Right { result: unit, suffix: s }
 
 -- | Match any character.
 anyChar :: Parser Char
-anyChar = Parser \{ str, pos } ->
-  case codePointAt pos str of
+anyChar = Parser \{ substring, position } ->
+  case SCP.codePointAt 0 substring of
     Just cp -> case toChar cp of
-      Just chr -> Right { result: chr, suffix: { str, pos: pos + 1 } }
-      Nothing -> Left { pos, error: "CodePoint " <> show cp <> " is not a character" }
-    Nothing -> Left { pos, error: "Unexpected EOF" }
+      Just chr -> Right { result: chr, suffix: { substring: SCP.drop 1 substring, position: position + 1 } }
+      Nothing -> Left { pos: position, error: "CodePoint " <> show cp <> " is not a character" }
+    Nothing -> Left { pos: position, error: "Unexpected EOF" }
   where
   toChar = fromCharCode <<< fromEnum
 
 -- | Match any digit.
 anyDigit :: Parser Char
 anyDigit = try do
-  c <- anyChar
+  c <- CodeUnitsParser.anyChar
   if c >= '0' && c <= '9' then pure c
   else fail $ "Character " <> show c <> " is not a digit"
 
 -- | Match the specified string.
 string :: String -> Parser String
-string nt = Parser \s ->
-  case s of
-    { str, pos } | indexOf' (Pattern nt) pos str == Just pos -> Right { result: nt, suffix: { str, pos: pos + length nt } }
-    { pos } -> Left { pos, error: "Expected '" <> nt <> "'." }
+string pattern = Parser \{ substring, position } ->
+  let
+    length = SCP.length pattern
+    { before, after } = SCP.splitAt length substring
+  in
+    if before == pattern then Right { result: pattern, suffix: { substring: after, position: position + length } }
+    else Left { pos: position, error: "Expected '" <> pattern <> "'." }
 
 -- | Match a character satisfying the given predicate.
 satisfy :: (Char -> Boolean) -> Parser Char
@@ -86,7 +89,7 @@ char c = satisfy (_ == c) <?> "Could not match character " <> show c
 whiteSpace :: Parser String
 whiteSpace = do
   cs <- many (satisfy \c -> c == '\n' || c == '\r' || c == ' ' || c == '\t')
-  pure (foldMap singleton cs)
+  pure (foldMap SCU.singleton cs)
 
 -- | Skip many whitespace characters.
 skipSpaces :: Parser Unit
@@ -103,14 +106,14 @@ noneOf = satisfy <<< flip notElem
 -- | Match any lower case character.
 lowerCaseChar :: Parser Char
 lowerCaseChar = try do
-  c <- anyChar
+  c <- CodeUnitsParser.anyChar
   if toCharCode c `elem` (97 .. 122) then pure c
   else fail $ "Expected a lower case character but found " <> show c
 
 -- | Match any upper case character.
 upperCaseChar :: Parser Char
 upperCaseChar = try do
-  c <- anyChar
+  c <- CodeUnitsParser.anyChar
   if toCharCode c `elem` (65 .. 90) then pure c
   else fail $ "Expected an upper case character but found " <> show c
 
@@ -135,10 +138,9 @@ regex pat =
   pattern = "^(" <> pat <> ")"
 
   matchRegex :: Regex.Regex -> Parser String
-  matchRegex r = Parser \{ str, pos } -> do
-    let remainder = drop pos str
-    case NEA.head <$> Regex.match r remainder of
+  matchRegex r = Parser \{ substring, position } -> do
+    case NEA.head <$> Regex.match r substring of
       Just (Just matched) ->
-        Right { result: matched, suffix: { str, pos: pos + length matched } }
+        Right { result: matched, suffix: { substring: SCP.drop (SCP.length matched) substring, position: position + SCP.length matched } }
       _ ->
-        Left { pos, error: "no match" }
+        Left { pos: position, error: "no match" }

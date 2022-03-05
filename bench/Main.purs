@@ -59,21 +59,21 @@ main = do
     $ \_ -> runParser parse23AnyCharUnits string23_10000
 
   log "StringParser.runParser parse23DigitPoints"
-  benchWith 20
+  benchWith 200
     $ \_ -> runParser parse23DigitPoints string23_10000
   log "StringParser.runParser parse23DigitUnits"
   benchWith 200
     $ \_ -> runParser parse23DigitUnits string23_10000
 
   log "StringParser.runParser parse23StringPoints"
-  benchWith 20
+  benchWith 200
     $ \_ -> runParser parse23StringPoints string23_10000
   log "StringParser.runParser parse23StringUnits"
   benchWith 200
     $ \_ -> runParser parse23StringUnits string23_10000
 
   log "StringParser.runParser parse23RegexPoints"
-  benchWith 20
+  benchWith 200
     $ \_ -> runParser parse23RegexPoints string23_10000
   log "StringParser.runParser parse23RegexUnits"
   benchWith 200

@@ -9,21 +9,19 @@ import Control.MonadPlus (class MonadPlus, class MonadZero, class Alternative)
 import Control.Monad.Rec.Class (class MonadRec, tailRecM, Step(..))
 import Control.Plus (class Plus, class Alt)
 import Control.Lazy (class Lazy)
-import Data.Bifunctor (lmap)
 import Data.Either (Either(..))
 
 -- | A position in an input string.
 type Pos = Int
 
--- | Strings are represented as a string with an index from the
+-- | Strings are represented as a substring with an index from the
 -- | start of the string.
 -- |
--- | `{ str: s, pos: n }` is interpreted as the substring of `s`
--- | starting at index n.
+-- | `{ substring: s, position: n }` is interpreted as the substring `s`
+-- | starting at index n of the original string.
 -- |
--- | This allows us to avoid repeatedly finding substrings
--- | every time we match a character.
-type PosString = { str :: String, pos :: Pos }
+-- | The position is only kept for error messaging.
+type PosString = { substring :: String, position :: Pos }
 
 -- | The type of parsing errors.
 type ParseError = { error :: String, pos :: Pos }
@@ -43,7 +41,7 @@ unParser (Parser p) = p
 -- | Run a parser for an input string. See also `printParserError`
 -- | and `unParser` for more flexible usages.
 runParser :: forall a. Parser a -> String -> Either ParseError a
-runParser (Parser p) s = map _.result (p { str: s, pos: 0 })
+runParser (Parser p) s = map _.result (p { substring: s, position: 0 })
 
 -- | Prints a ParseError's the error message and the position of the error.
 printParserError :: ParseError -> String
@@ -65,7 +63,7 @@ instance altParser :: Alt Parser where
   alt (Parser p1) (Parser p2) = Parser \s ->
     case p1 s of
       Left { error, pos }
-        | s.pos == pos -> p2 s
+        | s.position == pos -> p2 s
         | otherwise -> Left { error, pos }
       right -> right
 
@@ -92,17 +90,20 @@ instance monadRecParser :: MonadRec Parser where
     split { result: Done b, suffix } = Done { result: b, suffix }
 
 instance lazyParser :: Lazy (Parser a) where
-  defer f = Parser $ \str -> unParser (f unit) str
+  defer f = Parser \str -> unParser (f unit) str
 
 -- | Fail with the specified message.
 fail :: forall a. String -> Parser a
-fail error = Parser \{ pos } -> Left { pos, error }
+fail error = Parser \{ position } -> Left { pos: position, error }
 
 -- | In case of error, the default behavior is to backtrack if no input was consumed.
 -- |
 -- | `try p` backtracks even if input was consumed.
 try :: forall a. Parser a -> Parser a
-try (Parser p) = Parser \(s@{ pos }) -> lmap (_ { pos = pos }) (p s)
+try (Parser p) = Parser \s ->
+  case p s of
+    Left { error } -> Left { pos: s.position, error }
+    right -> right
 
 instance semigroupParser :: Semigroup a => Semigroup (Parser a) where
   append = lift2 append

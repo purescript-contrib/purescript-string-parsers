@@ -1,7 +1,6 @@
 -- | This module defines combinators for building string parsers.
 module Text.Parsing.StringParser.Combinators
-  ( lookAhead
-  , many
+  ( many
   , many1
   , withError
   , (<?>)
@@ -22,6 +21,7 @@ module Text.Parsing.StringParser.Combinators
   , choice
   , manyTill
   , many1Till
+  , lookAhead
   , module Control.Lazy
   ) where
 

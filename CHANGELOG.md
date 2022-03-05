@@ -5,6 +5,7 @@ Notable changes to this project are documented in this file. The format is based
 ## [Unreleased]
 
 Breaking changes:
+- Issue #77: Fix CodePoint parser quadratic performance (#83 by @chtenb). The parser now tracks the remaining unparsed substring. This change is breaking, but will trigger compile errors in all places where this definition is used.
 - Fix semantics of endBy and sepEndBy parser combinators (#84 by @chtenb)
 
 New features:

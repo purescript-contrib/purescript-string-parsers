@@ -32,7 +32,6 @@ import Data.Foldable (class Foldable, foldMap, elem, notElem)
 import Data.Maybe (Maybe(..))
 import Data.String.CodeUnits (charAt, singleton)
 import Data.String.CodeUnits as SCU
-import Data.String.Pattern (Pattern(..))
 import Data.String.Regex as Regex
 import Data.String.Regex.Flags (noFlags)
 import Text.Parsing.StringParser (Parser(..), try, fail)
@@ -42,15 +41,15 @@ import Text.Parsing.StringParser.Combinators (many, (<?>))
 eof :: Parser Unit
 eof = Parser \s ->
   case s of
-    { str, pos } | pos < SCU.length str -> Left { pos, error: "Expected EOF" }
+    { substring, position } | 0 < SCU.length substring -> Left { pos: position, error: "Expected EOF" }
     _ -> Right { result: unit, suffix: s }
 
 -- | Match any character.
 anyChar :: Parser Char
-anyChar = Parser \{ str, pos } ->
-  case charAt pos str of
-    Just chr -> Right { result: chr, suffix: { str, pos: pos + 1 } }
-    Nothing -> Left { pos, error: "Unexpected EOF" }
+anyChar = Parser \{ substring, position } ->
+  case charAt 0 substring of
+    Just chr -> Right { result: chr, suffix: { substring: SCU.drop 1 substring, position: position + 1 } }
+    Nothing -> Left { pos: position, error: "Unexpected EOF" }
 
 -- | Match any digit.
 anyDigit :: Parser Char
@@ -61,10 +60,13 @@ anyDigit = try do
 
 -- | Match the specified string.
 string :: String -> Parser String
-string nt = Parser \s ->
-  case s of
-    { str, pos } | SCU.indexOf' (Pattern nt) pos str == Just pos -> Right { result: nt, suffix: { str, pos: pos + SCU.length nt } }
-    { pos } -> Left { pos, error: "Expected '" <> nt <> "'." }
+string pattern = Parser \{ substring, position } ->
+  let
+    length = SCU.length pattern
+    { before, after } = SCU.splitAt length substring
+  in
+    if before == pattern then Right { result: pattern, suffix: { substring: after, position: position + length } }
+    else Left { pos: position, error: "Expected '" <> pattern <> "'." }
 
 -- | Match a character satisfying the given predicate.
 satisfy :: (Char -> Boolean) -> Parser Char
@@ -130,10 +132,9 @@ regex pat =
   pattern = "^(" <> pat <> ")"
 
   matchRegex :: Regex.Regex -> Parser String
-  matchRegex r = Parser \{ str, pos } -> do
-    let remainder = SCU.drop pos str
-    case NEA.head <$> Regex.match r remainder of
+  matchRegex r = Parser \{ substring, position } -> do
+    case NEA.head <$> Regex.match r substring of
       Just (Just matched) ->
-        Right { result: matched, suffix: { str, pos: pos + SCU.length matched } }
+        Right { result: matched, suffix: { substring: SCU.drop (SCU.length matched) substring, position: position + SCU.length matched } }
       _ ->
-        Left { pos, error: "no match" }
+        Left { pos: position, error: "no match" }
