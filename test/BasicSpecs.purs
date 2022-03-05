@@ -12,9 +12,9 @@ import Data.Traversable (traverse)
 import Effect (Effect)
 import Effect.Class.Console (log)
 import Test.Assert (assert')
-import Text.Parsing.StringParser (Parser, runParser, try)
+import Text.Parsing.StringParser (Parser, runParser)
 import Text.Parsing.StringParser.CodePoints (anyChar, anyDigit, anyLetter, char, eof, skipSpaces, string)
-import Text.Parsing.StringParser.Combinators (between, chainl, chainl1, endBy, endBy1, lookAhead, many, many1, manyTill, sepBy, sepBy1, sepEndBy, sepEndBy1)
+import Text.Parsing.StringParser.Combinators (try, tryAhead, between, chainl, chainl1, endBy, endBy1, lookAhead, many, many1, manyTill, sepBy, sepBy1, sepEndBy, sepEndBy1)
 
 type TestInputs = { successes :: Array String, failures :: Array String }
 type TestCase = { name :: String, parser :: AnyParser, inputs :: TestInputs }
@@ -57,7 +57,11 @@ testCases =
     }
   , { name: "lookAhead"
     , parser: mkAnyParser $ lookAhead (char 'a') *> anyLetter
-    , inputs: { successes: [ "a" ], failures: [ "", "b" ] }
+    , inputs: { successes: [ "a" ], failures: [ "", "b", "ab" ] }
+    }
+  , { name: "tryAhead"
+    , parser: mkAnyParser $ tryAhead (char 'a' *> anyDigit) *> (anyChar *> anyChar) <|> (anyDigit *> anyDigit)
+    , inputs: { successes: [ "a6", "66" ], failures: [ "", "b", "-", "6", "aa", "a6aa", "aa66" ] }
     }
   , { name: "many"
     , parser: mkAnyParser $ many (char 'a')
