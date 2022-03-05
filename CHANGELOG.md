@@ -9,6 +9,7 @@ Breaking changes:
 - Fix semantics of endBy and sepEndBy parser combinators (#84 by @chtenb)
 
 New features:
+- Introduce code point parsers `anyCodePoint`, `codePoint'` and `satisfyCodePoint` (#88 by @chtenb)
 
 Bugfixes:
 - Do not export `chainl'` and `chainr'` helper functions (#84 by @chtenb)
