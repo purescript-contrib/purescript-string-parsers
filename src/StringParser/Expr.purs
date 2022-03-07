@@ -57,7 +57,7 @@ buildExprParser operators simpleExpr = do
             <|> lassocP x lassocOp prefixP term postfixP
             <|> nassocP x nassocOp prefixP term postfixP
             <|> pure x
-            <?> "operator"
+              <?> "operator"
 
     splitOp :: forall b. Operator b -> SplitAccum b -> SplitAccum b
     splitOp (Infix op AssocNone) accum = accum { nassoc = Cons op accum.nassoc }
