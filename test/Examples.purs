@@ -8,9 +8,7 @@ import Data.Foldable (fold, foldl, sum)
 import Data.List.Types (NonEmptyList)
 import Effect (Effect)
 import Effect.Console (log, logShow)
-import StringParser.Common (Parser, fail, runParser, unParser)
-import StringParser.CodePoints (anyChar, char, eof, regex, skipSpaces, string)
-import StringParser.Combinators (between, lookAhead, endBy1, many, many1, sepBy1, (<?>))
+import StringParser (Parser, anyChar, between, char, endBy1, eof, fail, lookAhead, many, many1, regex, runParser, sepBy1, skipSpaces, string, unParser, (<?>))
 
 -- Serves only to make this file runnable
 main :: Effect Unit
@@ -95,14 +93,14 @@ extractWords = do
     ( many1
         ( string " " <?> "Failed to match space as a separator"
             <|> string "'"
-            <?> "Failed to match single-quote char as a separator"
+              <?> "Failed to match single-quote char as a separator"
             <|> string ","
-            <?> "Failed to match comma as a separator"
+              <?> "Failed to match comma as a separator"
             <|> string "?"
-            <?> "Failed to match question mark as a separator"
+              <?> "Failed to match question mark as a separator"
             <|> string "."
-            <?> "Failed to match period as a separator"
-            <?> "Could not find a character that separated the content..."
+              <?> "Failed to match period as a separator"
+              <?> "Could not find a character that separated the content..."
         )
     )
 
@@ -113,12 +111,12 @@ badExtractWords = do
     ( many1
         ( string " " <?> "Failed to match space as a separator"
             <|> string "'"
-            <?> "Failed to match single-quote char as a separator"
+              <?> "Failed to match single-quote char as a separator"
             <|> string ","
-            <?> "Failed to match comma as a separator"
-            -- <|> string "?" <?> "Failed to match question mark as a separator"
-            -- <|> string "." <?> "Failed to match period as a separator"
-            <?> "Could not find a character that separated the content..."
+              <?> "Failed to match comma as a separator"
+              -- <|> string "?" <?> "Failed to match question mark as a separator"
+              -- <|> string "." <?> "Failed to match period as a separator"
+              <?> "Could not find a character that separated the content..."
         )
     )
   -- short for 'end of file' or 'end of content'

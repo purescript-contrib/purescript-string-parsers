@@ -1,4 +1,4 @@
-module StringParser.StringParser
+module StringParser
   ( module StringParser.Common
   , module StringParser.Combinators
   , module StringParser.CodePoints
