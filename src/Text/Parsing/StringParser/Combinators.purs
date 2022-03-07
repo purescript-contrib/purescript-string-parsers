@@ -47,19 +47,23 @@ lookAhead (Parser p) = Parser \s ->
     Right { result } -> Right { result, suffix: s }
     left -> left
 
--- | Match zero or more times.
+-- | Match a parser zero or more times.
+-- | Stops matching when the parser fails or does not consume anymore.
 many :: forall a. Parser a -> Parser (List a)
 many = manyRec <<< assertConsume
 
--- | Match one or more times.
+-- | Match a parser one or more times.
+-- | Stops matching when the parser fails or does not consume anymore.
 many1 :: forall a. Parser a -> Parser (NonEmptyList a)
 many1 p = cons' <$> p <*> many p
 
--- | Parse values until a terminator.
+-- | Match a parser until a terminator parser matches.
+-- | Fails when the parser does not consume anymore.
 manyTill :: forall a end. Parser a -> Parser end -> Parser (List a)
 manyTill p end = (end *> pure Nil) <|> map NEL.toList (many1Till p end)
 
--- | Parse values until the terminator matches, requiring at least one match.
+-- | Match a parser until a terminator parser matches, requiring at least one match.
+-- | Fails when the parser does not consume anymore.
 many1Till :: forall a end. Parser a -> Parser end -> Parser (NonEmptyList a)
 many1Till p end = do
   x <- p
@@ -73,7 +77,7 @@ many1Till p end = do
     pure $ Loop (NEL.cons c acc)
   inner acc = ending acc <|> continue acc
 
--- | Run given parser and fail with parse error if the parser did not consume any input.
+-- | Run given parser and fail if the parser did not consume any input.
 assertConsume :: forall a. Parser a -> Parser a
 assertConsume (Parser p) = Parser \s ->
   case p s of
