@@ -14,6 +14,7 @@ Bugfixes:
 - Do not export `chainl'` and `chainr'` helper functions (#84 by @chtenb)
 - Issue #69: Fix regex parser to always wrap pattern inside `^(..)` (#80 by @chtenb)
 - Issue #75: Make `many` and cousins fail when the inner parser does not consume, instead of hang indefinitely (#87 by @chtenb)
+- Issue #73: lookAhead consumes input on failure. Introduce `tryAhead` and correct documentation for `lookAhead` (#86 by @chtenb)
 
 Other improvements:
 - Added `purs-tidy` formatter (#76 by @thomashoneyman)

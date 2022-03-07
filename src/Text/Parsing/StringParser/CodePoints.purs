@@ -35,8 +35,8 @@ import Data.String.CodePoints as SCP
 import Data.String.CodeUnits as SCU
 import Data.String.Regex as Regex
 import Data.String.Regex.Flags (noFlags)
-import Text.Parsing.StringParser (Parser(..), try, fail)
-import Text.Parsing.StringParser.Combinators (many, (<?>))
+import Text.Parsing.StringParser (Parser(..), fail)
+import Text.Parsing.StringParser.Combinators (try, many, (<?>))
 import Text.Parsing.StringParser.CodeUnits as CodeUnitsParser
 
 -- | Match the end of the file.
