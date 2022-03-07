@@ -48,7 +48,7 @@ try (Parser p) = Parser \s ->
     Left { error } -> Left { pos: s.position, error }
     right -> right
 
--- | `try p` means: run `p` but do not consume input in case of success.
+-- | `lookAhead p` means: run `p` but do not consume input in case of success.
 -- | In most cases you will probably want to use `tryAhead` instead.
 lookAhead :: forall a. Parser a -> Parser a
 lookAhead (Parser p) = Parser \s ->
