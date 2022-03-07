@@ -13,6 +13,7 @@
   , "maybe"
   , "minibench"
   , "nonempty"
+  , "partial"
   , "prelude"
   , "psci-support"
   , "strings"
