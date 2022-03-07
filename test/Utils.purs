@@ -1,6 +1,6 @@
 module Test.Utils where
 
-import Text.Parsing.StringParser.Common (Parser)
+import StringParser.Common (Parser)
 
 newtype AnyParser = AnyParser (forall r. (forall a. Parser a -> r) -> r)
 

@@ -15,9 +15,9 @@ import Data.List.Types (List)
 import Effect (Effect)
 import Effect.Console (log)
 import Performance.Minibench (benchWith)
-import Text.Parsing.StringParser.Common (Parser, runParser)
-import Text.Parsing.StringParser.CodePoints as StringParser.CodePoints
-import Text.Parsing.StringParser.CodeUnits as StringParser.CodeUnits
+import StringParser.Common (Parser, runParser)
+import StringParser.CodePoints as StringParser.CodePoints
+import StringParser.CodeUnits as StringParser.CodeUnits
 
 string23_100 :: String
 string23_100 = fold $ replicate 100 "23"
