@@ -5,6 +5,9 @@ module Text.Parsing.StringParser.Combinators
   , tryAhead
   , many
   , many1
+  , manyTill
+  , many1Till
+  , assertConsume
   , withError
   , (<?>)
   , between
@@ -22,8 +25,6 @@ module Text.Parsing.StringParser.Combinators
   , chainl1
   , chainr1
   , choice
-  , manyTill
-  , many1Till
   , module Control.Lazy
   ) where
 
@@ -61,13 +62,44 @@ lookAhead (Parser p) = Parser \s ->
 tryAhead :: forall a. Parser a -> Parser a
 tryAhead = try <<< lookAhead
 
--- | Match zero or more times.
+-- | Match a parser zero or more times.
+-- | Stops matching when the parser fails or does not consume anymore.
 many :: forall a. Parser a -> Parser (List a)
-many = manyRec
+many = manyRec <<< assertConsume
 
--- | Match one or more times.
+-- | Match a parser one or more times.
+-- | Stops matching when the parser fails or does not consume anymore.
 many1 :: forall a. Parser a -> Parser (NonEmptyList a)
 many1 p = cons' <$> p <*> many p
+
+-- | Match a parser until a terminator parser matches.
+-- | Fails when the parser does not consume anymore.
+manyTill :: forall a end. Parser a -> Parser end -> Parser (List a)
+manyTill p end = (end *> pure Nil) <|> map NEL.toList (many1Till p end)
+
+-- | Match a parser until a terminator parser matches, requiring at least one match.
+-- | Fails when the parser does not consume anymore.
+many1Till :: forall a end. Parser a -> Parser end -> Parser (NonEmptyList a)
+many1Till p end = do
+  x <- p
+  tailRecM inner (pure x)
+  where
+  ending acc = do
+    _ <- end
+    pure $ Done (NEL.reverse acc)
+  continue acc = do
+    c <- assertConsume p
+    pure $ Loop (NEL.cons c acc)
+  inner acc = ending acc <|> continue acc
+
+-- | Run given parser and fail if the parser did not consume any input.
+assertConsume :: forall a. Parser a -> Parser a
+assertConsume (Parser p) = Parser \s ->
+  case p s of
+    Right result ->
+      if s.position < result.suffix.position then Right result
+      else Left { pos: s.position, error: "Consumed no input." }
+    x -> x
 
 -- | Provide an error message in case of failure.
 withError :: forall a. Parser a -> String -> Parser a
@@ -163,24 +195,6 @@ chainr1' p f a =
 -- | Parse using any of a collection of parsers.
 choice :: forall f a. Foldable f => f (Parser a) -> Parser a
 choice = foldl (<|>) (fail "Nothing to parse")
-
--- | Parse values until a terminator.
-manyTill :: forall a end. Parser a -> Parser end -> Parser (List a)
-manyTill p end = (end *> pure Nil) <|> map NEL.toList (many1Till p end)
-
--- | Parse values until the terminator matches, requiring at least one match.
-many1Till :: forall a end. Parser a -> Parser end -> Parser (NonEmptyList a)
-many1Till p end = do
-  x <- p
-  tailRecM inner (pure x)
-  where
-  ending acc = do
-    _ <- end
-    pure $ Done (NEL.reverse acc)
-  continue acc = do
-    c <- p
-    pure $ Loop (NEL.cons c acc)
-  inner acc = ending acc <|> continue acc
 
 cons' :: forall a. a -> List a -> NonEmptyList a
 cons' h t = NonEmptyList (h :| t)
