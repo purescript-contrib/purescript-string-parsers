@@ -15,7 +15,7 @@ import Data.List.Types (List)
 import Effect (Effect)
 import Effect.Console (log)
 import Performance.Minibench (benchWith)
-import Text.Parsing.StringParser (Parser, runParser)
+import Text.Parsing.StringParser.Common (Parser, runParser)
 import Text.Parsing.StringParser.CodePoints as StringParser.CodePoints
 import Text.Parsing.StringParser.CodeUnits as StringParser.CodeUnits
 

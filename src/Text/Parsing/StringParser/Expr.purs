@@ -12,7 +12,7 @@ import Prelude
 import Control.Alt ((<|>))
 import Data.Foldable (foldl, foldr)
 import Data.List (List(..))
-import Text.Parsing.StringParser (Parser)
+import Text.Parsing.StringParser.Common (Parser)
 import Text.Parsing.StringParser.Combinators (choice, (<?>))
 
 -- | Operator associativity types.

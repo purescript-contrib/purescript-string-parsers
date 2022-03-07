@@ -8,7 +8,7 @@ import Data.Foldable (fold, foldl, sum)
 import Data.List.Types (NonEmptyList)
 import Effect (Effect)
 import Effect.Console (log, logShow)
-import Text.Parsing.StringParser (Parser, fail, runParser, unParser)
+import Text.Parsing.StringParser.Common (Parser, fail, runParser, unParser)
 import Text.Parsing.StringParser.CodePoints (anyChar, char, eof, regex, skipSpaces, string)
 import Text.Parsing.StringParser.Combinators (between, lookAhead, endBy1, many, many1, sepBy1, (<?>))
 
