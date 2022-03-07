@@ -40,8 +40,8 @@ import Data.String.CodeUnits as SCU
 import Data.String.Regex as Regex
 import Data.String.Regex.Flags (noFlags)
 import Text.Parsing.StringParser (Parser(..), fail)
-import Text.Parsing.StringParser.Combinators (try, many, (<?>))
 import Text.Parsing.StringParser.CodeUnits as CodeUnitsParser
+import Text.Parsing.StringParser.Combinators (try, many, (<?>))
 
 -- | Match the end of the file.
 eof :: Parser Unit
@@ -69,9 +69,9 @@ anyChar = do
 -- | Match any code point.
 anyCodePoint :: Parser CodePoint
 anyCodePoint = Parser \{ substring, position } ->
-  case SCP.codePointAt 0 substring of
-    Just cp -> Right { result: cp, suffix: { substring: SCP.drop 1 substring, position: position + 1 } }
+  case SCP.uncons substring of
     Nothing -> Left { pos: position, error: "Unexpected EOF" }
+    Just { head, tail } -> Right { result: head, suffix: { substring: tail, position: position + 1 } }
 
 -- | Match any digit.
 anyDigit :: Parser Char
