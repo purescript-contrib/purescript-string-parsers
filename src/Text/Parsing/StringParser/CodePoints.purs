@@ -53,12 +53,18 @@ eof = Parser \s ->
 -- | Match any character from the Basic Multilingual Plane.
 anyChar :: Parser Char
 anyChar = do
-  cp <- anyCodePoint
-  case toChar cp of
-    Just chr -> pure chr
-    Nothing -> fail $ "Code point " <> show cp <> " is not a character"
+  cc <- anyCodePoint <#> fromEnum
+  case fromCharCode cc of
+    Just chr ->
+      -- the `fromCharCode` function doesn't check if this is beyond the
+      -- BMP, so we check that ourselves.
+      -- https://github.com/purescript/purescript-strings/issues/153
+      if cc > 65535 -- BMP
+      then notAChar cc
+      else pure chr
+    Nothing -> notAChar cc
   where
-  toChar = fromCharCode <<< fromEnum
+  notAChar cc = fail $ "Code point " <> show cc <> " is not a character"
 
 -- | Match any code point.
 anyCodePoint :: Parser CodePoint

@@ -29,9 +29,11 @@ testCases :: Array TestCase
 testCases =
   [ { name: "anyChar"
     , parser: mkAnyParser anyChar
-    -- TODO: test "🙂" which should fail
-    -- this is an open upstream issue https://github.com/purescript/purescript-strings/issues/153
-    , inputs: { successes: [ "a", "%" ], failures: [ "", "aa" ] }
+    , inputs: { successes: [ "a", "%" ], failures: [ "", "aa", "🙂" ] }
+    }
+  , { name: "many anyChar"
+    , parser: mkAnyParser $ many anyChar
+    , inputs: { successes: [ "", "a", "%", "aa" ], failures: [ "🙂" ] }
     }
   , { name: "anyCodePoint"
     , parser: mkAnyParser anyCodePoint

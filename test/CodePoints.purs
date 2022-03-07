@@ -120,7 +120,7 @@ testCodePoints = do
   assert $ expectResult "\x458CA" (string "\x458CA" <* string ")" <* eof) "\x458CA)"
   assert $ expectResult '\xEEE2' (char '\xEEE2' <* eof) "\xEEE2"
   assert $ expectPosition 1 anyChar "\xEEE2"
-  assert $ expectPosition 1 anyChar "\x458CA"
+  assert $ parseFail anyChar "\x458CA" -- Is beyond BMP
 
   log "Running overflow tests (may take a while)"
 
