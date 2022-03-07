@@ -15,9 +15,9 @@ import Effect.Class.Console (log)
 import Partial.Unsafe (unsafePartial)
 import Test.Assert (assert')
 import Test.Utils (AnyParser(..), mkAnyParser)
-import Text.Parsing.StringParser (Parser, runParser, try)
+import Text.Parsing.StringParser (Parser, runParser)
 import Text.Parsing.StringParser.CodePoints (anyChar, anyCodePoint, anyDigit, anyLetter, char, codePoint, eof, skipSpaces, string)
-import Text.Parsing.StringParser.Combinators (between, chainl, chainl1, endBy, endBy1, lookAhead, many, many1, manyTill, sepBy, sepBy1, sepEndBy, sepEndBy1)
+import Text.Parsing.StringParser.Combinators (try, tryAhead, between, chainl, chainl1, endBy, endBy1, lookAhead, many, many1, manyTill, many1Till, optionMaybe, sepBy, sepBy1, sepEndBy, sepEndBy1)
 
 type TestInputs = { successes :: Array String, failures :: Array String }
 type TestCase = { name :: String, parser :: AnyParser, inputs :: TestInputs }
@@ -71,15 +71,47 @@ testCases =
     }
   , { name: "lookAhead"
     , parser: mkAnyParser $ lookAhead (char 'a') *> anyLetter
-    , inputs: { successes: [ "a" ], failures: [ "", "b" ] }
+    , inputs: { successes: [ "a" ], failures: [ "", "b", "ab" ] }
+    }
+  , { name: "tryAhead"
+    , parser: mkAnyParser $ tryAhead (char 'a' *> anyDigit) *> (anyChar *> anyChar) <|> (anyDigit *> anyDigit)
+    , inputs: { successes: [ "a6", "66" ], failures: [ "", "b", "-", "6", "aa", "a6aa", "aa66" ] }
     }
   , { name: "many"
     , parser: mkAnyParser $ many (char 'a')
     , inputs: { successes: [ "", "a", "aaaa" ], failures: [ "b" ] }
     }
+  , { name: "many no consumption"
+    , parser: mkAnyParser $ many (eof)
+    , inputs: { successes: [ "" ], failures: [ "b" ] }
+    }
   , { name: "many1"
     , parser: mkAnyParser $ many1 (char 'a')
     , inputs: { successes: [ "a", "aaaa" ], failures: [ "", "b" ] }
+    }
+  , { name: "many1 no consumption"
+    , parser: mkAnyParser $ many1 (eof)
+    , inputs: { successes: [ "" ], failures: [ "b" ] }
+    }
+  , { name: "manyTill"
+    , parser: mkAnyParser $ manyTill anyLetter (char ';')
+    , inputs: { successes: [ ";", "a;", "abc;" ], failures: [ "", "a", ";a", "ab", "a;b", "a;b;c" ] }
+    }
+  , { name: "manyTill no consumption"
+    , parser: mkAnyParser $ manyTill (optionMaybe (char 'a')) (char ';')
+    , inputs: { successes: [ ";", "a;", "aaa;" ], failures: [ "", "a", ";a", "ab", "a;b", "a;b;c" ] }
+    }
+  , { name: "manyTill overlapping"
+    , parser: mkAnyParser $ manyTill anyLetter (char 'z')
+    , inputs: { successes: [ "z", "az", "abcz" ], failures: [ "", "a", "za", "ab", "azb", "azbzc" ] }
+    }
+  , { name: "many1Till"
+    , parser: mkAnyParser $ many1Till anyLetter (char ';')
+    , inputs: { successes: [ "a;", "abc;" ], failures: [ "", ";", "a", ";a", "ab", "a;b", "a;b;c" ] }
+    }
+  , { name: "many1Till overlapping"
+    , parser: mkAnyParser $ many1Till anyLetter (char 'z')
+    , inputs: { successes: [ "az", "abcz" ], failures: [ "", "z", "a", "za", "ab", "azb", "azbzc" ] }
     }
   , { name: "between"
     , parser: mkAnyParser $ between (char 'a') (char 'b') (char 'x')
@@ -108,14 +140,6 @@ testCases =
   , { name: "endBy1"
     , parser: mkAnyParser $ endBy1 anyLetter (char ';')
     , inputs: { successes: [ "a;", "a;b;", "a;b;c;" ], failures: [ "", ";", "a", ";a", "ab", "a;b", "a;b;c" ] }
-    }
-  , { name: "manyTill"
-    , parser: mkAnyParser $ manyTill anyLetter (char ';')
-    , inputs: { successes: [ ";", "a;", "abc;" ], failures: [ "", "a", ";a", "ab", "a;b", "a;b;c" ] }
-    }
-  , { name: "manyTill overlapping"
-    , parser: mkAnyParser $ manyTill anyLetter (char 'z')
-    , inputs: { successes: [ "z", "az", "abcz" ], failures: [ "", "a", "za", "ab", "azb", "azbzc" ] }
     }
   , { name: "chainl"
     , parser: mkAnyParser $ chainl (string "x") (char '+' $> (<>)) ""

@@ -96,15 +96,6 @@ instance lazyParser :: Lazy (Parser a) where
 fail :: forall a. String -> Parser a
 fail error = Parser \{ position } -> Left { pos: position, error }
 
--- | In case of error, the default behavior is to backtrack if no input was consumed.
--- |
--- | `try p` backtracks even if input was consumed.
-try :: forall a. Parser a -> Parser a
-try (Parser p) = Parser \s ->
-  case p s of
-    Left { error } -> Left { pos: s.position, error }
-    right -> right
-
 instance semigroupParser :: Semigroup a => Semigroup (Parser a) where
   append = lift2 append
 
