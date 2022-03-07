@@ -15,9 +15,9 @@ import Data.Unfoldable (replicate)
 import Effect (Effect)
 import Effect.Class.Console (log)
 import Test.Assert (assert', assert)
-import Text.Parsing.StringParser (ParseError, Parser(..), PosString, runParser, try)
+import Text.Parsing.StringParser (ParseError, Parser(..), PosString, runParser)
 import Text.Parsing.StringParser.CodePoints (anyDigit, char, eof, string, anyChar, regex)
-import Text.Parsing.StringParser.Combinators (many1, endBy1, sepBy1, optionMaybe, many, manyTill, many1Till, chainl, fix, between)
+import Text.Parsing.StringParser.Combinators (try, many1, endBy1, sepBy1, optionMaybe, many, manyTill, many1Till, chainl, fix, between)
 import Text.Parsing.StringParser.Expr (Assoc(..), Operator(..), buildExprParser)
 
 parens :: forall a. Parser a -> Parser a

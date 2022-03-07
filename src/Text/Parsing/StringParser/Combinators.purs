@@ -1,6 +1,9 @@
 -- | This module defines combinators for building string parsers.
 module Text.Parsing.StringParser.Combinators
-  ( many
+  ( try
+  , lookAhead
+  , tryAhead
+  , many
   , many1
   , withError
   , (<?>)
@@ -21,7 +24,6 @@ module Text.Parsing.StringParser.Combinators
   , choice
   , manyTill
   , many1Till
-  , lookAhead
   , module Control.Lazy
   ) where
 
@@ -39,12 +41,25 @@ import Data.Maybe (Maybe(..))
 import Data.NonEmpty ((:|))
 import Text.Parsing.StringParser (Parser(..), fail)
 
--- | Read ahead without consuming input.
+-- | `try p` means: run `p` but do not consume input in case of failure.
+try :: forall a. Parser a -> Parser a
+try (Parser p) = Parser \s ->
+  case p s of
+    Left { error } -> Left { pos: s.position, error }
+    right -> right
+
+-- | `lookAhead p` means: run `p` but do not consume input in case of success.
+-- | In most cases you will probably want to use `tryAhead` instead.
 lookAhead :: forall a. Parser a -> Parser a
 lookAhead (Parser p) = Parser \s ->
   case p s of
     Right { result } -> Right { result, suffix: s }
     left -> left
+
+-- | Read ahead without consuming input.
+-- | `tryAhead p` means: succeed if what comes next is of the form `p`; fail otherwise.
+tryAhead :: forall a. Parser a -> Parser a
+tryAhead = try <<< lookAhead
 
 -- | Match zero or more times.
 many :: forall a. Parser a -> Parser (List a)
