@@ -34,7 +34,7 @@ import Data.String.CodeUnits (charAt, singleton)
 import Data.String.CodeUnits as SCU
 import Data.String.Regex as Regex
 import Data.String.Regex.Flags (noFlags)
-import StringParser.Common (Parser(..), fail)
+import StringParser.Parser (Parser(..), fail)
 import StringParser.Combinators (try, many, (<?>))
 
 -- | Match the end of the file.

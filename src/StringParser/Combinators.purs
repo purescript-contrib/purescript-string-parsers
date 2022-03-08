@@ -40,7 +40,7 @@ import Data.List.NonEmpty (NonEmptyList(..))
 import Data.List.NonEmpty as NEL
 import Data.Maybe (Maybe(..))
 import Data.NonEmpty ((:|))
-import StringParser.Common (Parser(..), fail)
+import StringParser.Parser (Parser(..), fail)
 
 -- | `try p` means: run `p` but do not consume input in case of failure.
 try :: forall a. Parser a -> Parser a

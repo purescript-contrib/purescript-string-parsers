@@ -39,7 +39,7 @@ import Data.String.CodePoints as SCP
 import Data.String.CodeUnits as SCU
 import Data.String.Regex as Regex
 import Data.String.Regex.Flags (noFlags)
-import StringParser.Common (Parser(..), fail)
+import StringParser.Parser (Parser(..), fail)
 import StringParser.CodeUnits as CodeUnitsParser
 import StringParser.Combinators (try, many, (<?>))
 

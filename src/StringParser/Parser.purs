@@ -1,6 +1,6 @@
 -- | This module defines the `Parser` type of string parsers, and its instances.
 
-module StringParser.Common where
+module StringParser.Parser where
 
 import Prelude
 
