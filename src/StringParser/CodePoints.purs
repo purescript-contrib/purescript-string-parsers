@@ -3,7 +3,7 @@
 -- | These functions will be much slower than the `CodeUnits` alternatives, but
 -- | will behave correctly in the presence of Unicode characters made up of
 -- | multiple code units.
-module Text.Parsing.StringParser.CodePoints
+module StringParser.CodePoints
   ( eof
   , anyChar
   , anyCodePoint
@@ -39,9 +39,9 @@ import Data.String.CodePoints as SCP
 import Data.String.CodeUnits as SCU
 import Data.String.Regex as Regex
 import Data.String.Regex.Flags (noFlags)
-import Text.Parsing.StringParser (Parser(..), fail)
-import Text.Parsing.StringParser.CodeUnits as CodeUnitsParser
-import Text.Parsing.StringParser.Combinators (try, many, (<?>))
+import StringParser.Parser (Parser(..), fail)
+import StringParser.CodeUnits as CodeUnitsParser
+import StringParser.Combinators (try, many, (<?>))
 
 -- | Match the end of the file.
 eof :: Parser Unit
@@ -157,7 +157,7 @@ regex :: String -> Parser String
 regex pat =
   case Regex.regex pattern noFlags of
     Left _ ->
-      fail $ "Text.Parsing.StringParser.String.regex': illegal regex " <> pat
+      fail $ "StringParser.String.regex': illegal regex " <> pat
     Right r ->
       matchRegex r
   where

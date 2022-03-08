@@ -1,6 +1,6 @@
 -- | This module defines helper functions for defining parsers using operator tables.
 
-module Text.Parsing.StringParser.Expr
+module StringParser.Expr
   ( Assoc(..)
   , Operator(..)
   , OperatorTable()
@@ -12,8 +12,8 @@ import Prelude
 import Control.Alt ((<|>))
 import Data.Foldable (foldl, foldr)
 import Data.List (List(..))
-import Text.Parsing.StringParser (Parser)
-import Text.Parsing.StringParser.Combinators (choice, (<?>))
+import StringParser.Parser (Parser)
+import StringParser.Combinators (choice, (<?>))
 
 -- | Operator associativity types.
 data Assoc = AssocNone | AssocLeft | AssocRight
@@ -57,7 +57,7 @@ buildExprParser operators simpleExpr = do
             <|> lassocP x lassocOp prefixP term postfixP
             <|> nassocP x nassocOp prefixP term postfixP
             <|> pure x
-            <?> "operator"
+              <?> "operator"
 
     splitOp :: forall b. Operator b -> SplitAccum b -> SplitAccum b
     splitOp (Infix op AssocNone) accum = accum { nassoc = Cons op accum.nassoc }

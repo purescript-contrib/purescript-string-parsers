@@ -7,6 +7,7 @@ Notable changes to this project are documented in this file. The format is based
 Breaking changes:
 - Issue #77: Fix CodePoint parser quadratic performance (#83 by @chtenb). The parser now tracks the remaining unparsed substring. This change is breaking, but will trigger compile errors in all places where this definition is used.
 - Fix semantics of endBy and sepEndBy parser combinators (#84 by @chtenb)
+- Issue #78: Remove the Text.Parsing prefix from the modules (#89 by @chtenb)
 
 New features:
 - Introduce code point parsers `anyCodePoint`, `codePoint'` and `satisfyCodePoint` (#88 by @chtenb)
@@ -21,6 +22,7 @@ Other improvements:
 - Added `purs-tidy` formatter (#76 by @thomashoneyman)
 - Add a benchmark module (#79 by @chtenb)
 - Run slowest tests last and print status updates (#72)
+- Re-export the main API from a single module (StringParser) (#89 by @chtenb)
 
 ## [v6.0.1](https://github.com/purescript-contrib/purescript-string-parsers/releases/tag/v6.0.1) - 2021-05-11
 

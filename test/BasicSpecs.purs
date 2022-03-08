@@ -15,9 +15,7 @@ import Effect.Class.Console (log)
 import Partial.Unsafe (unsafePartial)
 import Test.Assert (assert')
 import Test.Utils (AnyParser(..), mkAnyParser)
-import Text.Parsing.StringParser (Parser, runParser)
-import Text.Parsing.StringParser.CodePoints (anyChar, anyCodePoint, anyDigit, anyLetter, char, codePoint, eof, skipSpaces, string)
-import Text.Parsing.StringParser.Combinators (try, tryAhead, between, chainl, chainl1, endBy, endBy1, lookAhead, many, many1, manyTill, many1Till, optionMaybe, sepBy, sepBy1, sepEndBy, sepEndBy1)
+import StringParser (Parser, anyChar, anyCodePoint, anyDigit, anyLetter, between, chainl, chainl1, char, codePoint, endBy, endBy1, eof, lookAhead, many, many1, many1Till, manyTill, optionMaybe, runParser, sepBy, sepBy1, sepEndBy, sepEndBy1, skipSpaces, string, try, tryAhead)
 
 type TestInputs = { successes :: Array String, failures :: Array String }
 type TestCase = { name :: String, parser :: AnyParser, inputs :: TestInputs }
