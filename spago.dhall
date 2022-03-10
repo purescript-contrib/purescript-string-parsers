@@ -23,4 +23,5 @@
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs", "bench/**/*.purs" ]
+, license = "MIT"
 }
