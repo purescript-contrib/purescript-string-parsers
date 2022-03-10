@@ -1,39 +1,38 @@
 {
-  "name": "purescript-string-parsers",
-  "description": "A parsing library for parsing strings",
-  "keywords": [
-    "purescript"
-  ],
-  "license": "MIT",
-  "ignore": [
-    "**/.*",
-    "bower_components",
-    "node_modules",
-    "output",
-    "tests",
-    "bower.json",
-    "package.json"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/purescript-contrib/purescript-string-parsers.git"
-  },
-  "dependencies": {
-    "purescript-arrays": "^6.0.0",
-    "purescript-bifunctors": "^5.0.0",
-    "purescript-control": "^5.0.0",
-    "purescript-either": "^5.0.0",
-    "purescript-foldable-traversable": "^5.0.0",
-    "purescript-lists": "^6.0.0",
-    "purescript-maybe": "^5.0.0",
-    "purescript-prelude": "^5.0.0",
-    "purescript-strings": "^5.0.0",
-    "purescript-tailrec": "^5.0.0"
-  },
-  "devDependencies": {
-    "purescript-assert": "^5.0.0",
-    "purescript-console": "^5.0.0",
-    "purescript-effect": "^3.0.0",
-    "purescript-math": "^3.0.0"
-  }
+    "name": "purescript-string-parsers",
+    "license": [
+        "MIT"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/purescript-contrib/purescript-string-parsers"
+    },
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "output"
+    ],
+    "dependencies": {
+        "purescript-arrays": "^v6.0.1",
+        "purescript-assert": "^v5.0.0",
+        "purescript-bifunctors": "^v5.0.0",
+        "purescript-console": "^v5.0.0",
+        "purescript-control": "^v5.0.0",
+        "purescript-effect": "^v3.0.0",
+        "purescript-either": "^v5.0.0",
+        "purescript-enums": "^v5.0.0",
+        "purescript-foldable-traversable": "^v5.0.1",
+        "purescript-lists": "^v6.0.1",
+        "purescript-maybe": "^v5.0.0",
+        "purescript-minibench": "^v3.0.0",
+        "purescript-nonempty": "^v6.0.0",
+        "purescript-partial": "^v3.0.0",
+        "purescript-prelude": "^v5.0.1",
+        "purescript-psci-support": "^v5.0.0",
+        "purescript-strings": "^v5.0.0",
+        "purescript-tailrec": "^v5.0.1",
+        "purescript-transformers": "^v5.1.0",
+        "purescript-unfoldable": "^v5.0.0"
+    }
 }
