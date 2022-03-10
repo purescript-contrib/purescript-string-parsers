@@ -5,6 +5,16 @@ Notable changes to this project are documented in this file. The format is based
 ## [Unreleased]
 
 Breaking changes:
+
+New features:
+
+Bugfixes:
+
+Other improvements:
+
+## [v7.0.0]
+
+Breaking changes:
 - Issue #77: Fix CodePoint parser quadratic performance (#83 by @chtenb). The parser now tracks the remaining unparsed substring. This change is breaking, but will trigger compile errors in all places where this definition is used.
 - Fix semantics of endBy and sepEndBy parser combinators (#84 by @chtenb)
 - Issue #78: Remove the Text.Parsing prefix from the modules (#89 by @chtenb)
