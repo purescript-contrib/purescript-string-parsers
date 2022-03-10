@@ -24,4 +24,5 @@
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs", "bench/**/*.purs" ]
 , license = "MIT"
+, repository = "https://github.com/purescript-contrib/purescript-string-parsers"
 }
