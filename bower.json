@@ -1,38 +1,38 @@
 {
-    "name": "purescript-string-parsers",
-    "license": [
-        "MIT"
-    ],
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/purescript-contrib/purescript-string-parsers"
-    },
-    "ignore": [
-        "**/.*",
-        "node_modules",
-        "bower_components",
-        "output"
-    ],
-    "dependencies": {
-        "purescript-arrays": "^v6.0.1",
-        "purescript-assert": "^v5.0.0",
-        "purescript-bifunctors": "^v5.0.0",
-        "purescript-console": "^v5.0.0",
-        "purescript-control": "^v5.0.0",
-        "purescript-effect": "^v3.0.0",
-        "purescript-either": "^v5.0.0",
-        "purescript-enums": "^v5.0.0",
-        "purescript-foldable-traversable": "^v5.0.1",
-        "purescript-lists": "^v6.0.1",
-        "purescript-maybe": "^v5.0.0",
-        "purescript-minibench": "^v3.0.0",
-        "purescript-nonempty": "^v6.0.0",
-        "purescript-partial": "^v3.0.0",
-        "purescript-prelude": "^v5.0.1",
-        "purescript-psci-support": "^v5.0.0",
-        "purescript-strings": "^v5.0.0",
-        "purescript-tailrec": "^v5.0.1",
-        "purescript-transformers": "^v5.1.0",
-        "purescript-unfoldable": "^v5.0.0"
-    }
+  "name": "purescript-string-parsers",
+  "license": [
+    "MIT"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/purescript-contrib/purescript-string-parsers"
+  },
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "output"
+  ],
+  "dependencies": {
+    "purescript-arrays": "master",
+    "purescript-assert": "master",
+    "purescript-bifunctors": "master",
+    "purescript-console": "master",
+    "purescript-control": "master",
+    "purescript-effect": "master",
+    "purescript-either": "master",
+    "purescript-enums": "master",
+    "purescript-foldable-traversable": "master",
+    "purescript-lists": "master",
+    "purescript-maybe": "master",
+    "purescript-minibench": "master",
+    "purescript-nonempty": "master",
+    "purescript-partial": "master",
+    "purescript-prelude": "master",
+    "purescript-psci-support": "master",
+    "purescript-strings": "master",
+    "purescript-tailrec": "master",
+    "purescript-transformers": "master",
+    "purescript-unfoldable": "master"
+  }
 }
