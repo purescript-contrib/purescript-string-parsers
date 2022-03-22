@@ -5,6 +5,8 @@ Notable changes to this project are documented in this file. The format is based
 ## [Unreleased]
 
 Breaking changes:
+- Update project and deps to PureScript v0.15.0 (#90 by @JordanMartinez)
+- Drop deprecated `MonadZero` instance (#90 by @JordanMartinez)
 
 New features:
 

@@ -15,7 +15,6 @@
   , "nonempty"
   , "partial"
   , "prelude"
-  , "psci-support"
   , "strings"
   , "tailrec"
   , "transformers"

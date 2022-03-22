@@ -5,7 +5,7 @@ module StringParser.Parser where
 import Prelude
 
 import Control.Apply (lift2)
-import Control.MonadPlus (class MonadPlus, class MonadZero, class Alternative)
+import Control.MonadPlus (class MonadPlus, class Alternative)
 import Control.Monad.Rec.Class (class MonadRec, tailRecM, Step(..))
 import Control.Plus (class Plus, class Alt)
 import Control.Lazy (class Lazy)
@@ -78,8 +78,6 @@ instance bindParser :: Bind Parser where
     unParser (f result) suffix
 
 instance monadParser :: Monad Parser
-
-instance monadZeroParser :: MonadZero Parser
 
 instance monadPlusParser :: MonadPlus Parser
 
