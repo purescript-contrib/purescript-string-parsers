@@ -105,7 +105,7 @@ assertConsume (Parser p) = Parser \s ->
 withError :: forall a. Parser a -> String -> Parser a
 withError p msg = p <|> fail msg
 
-infixr 3 withError as <?>
+infixr 2 withError as <?>
 
 -- | Parse a string between opening and closing markers.
 between :: forall a open close. Parser open -> Parser close -> Parser a -> Parser a
