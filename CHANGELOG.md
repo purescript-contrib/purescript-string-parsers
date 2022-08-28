@@ -10,6 +10,7 @@ New features:
 
 Bugfixes:
 - fix spago package sets' upstream url
+- make `sepEndBy` stack safe
 
 Other improvements:
 
