@@ -9,6 +9,7 @@ Breaking changes:
 New features:
 
 Bugfixes:
+- fix spago package sets' upstream url
 
 Other improvements:
 
