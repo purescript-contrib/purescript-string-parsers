@@ -7,6 +7,7 @@ import Effect.Console (log)
 import Test.CodePoints (testCodePoints)
 import Test.CodeUnits (testCodeUnits)
 import Test.BasicSpecs (runTestCases)
+import Test.StackSafeCombinators (testStackSafeCombinators)
 
 main :: Effect Unit
 main = do
@@ -18,3 +19,6 @@ main = do
 
   log "\n\nTesting CodePoint parsing\n"
   testCodePoints
+
+  log "\n\nTesting stack safety of combinators\n"
+  testStackSafeCombinators

@@ -142,11 +142,9 @@ sepEndBy p sep = (sepEndBy1 p sep <#> NEL.toList) <|> (sep $> Nil) <|> pure Nil
 sepEndBy1 :: forall a sep. Parser a -> Parser sep -> Parser (NonEmptyList a)
 sepEndBy1 p sep = do
   a <- p
-  ( do
-      _ <- sep
-      as <- sepEndBy p sep
-      pure (cons' a as)
-  ) <|> pure (NEL.singleton a)
+  as <- many $ try (sep *> p)
+  _ <- optional sep
+  pure (cons' a as)
 
 -- | Parse zero or more separated values, ending with a separator.
 endBy :: forall a sep. Parser a -> Parser sep -> Parser (List a)
