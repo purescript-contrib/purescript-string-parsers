@@ -7,7 +7,7 @@
 
 A parsing library for parsing strings.
 
-This library is a simpler, faster alternative to `purescript-parsing`, for when you know your input will be a string.
+This library is a simpler alternative to `purescript-parsing`, for when you know your input will be a string.
 
 ## Installation
 

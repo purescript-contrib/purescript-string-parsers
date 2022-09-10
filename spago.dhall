@@ -2,7 +2,6 @@
 , dependencies =
   [ "arrays"
   , "assert"
-  , "bifunctors"
   , "console"
   , "control"
   , "effect"
