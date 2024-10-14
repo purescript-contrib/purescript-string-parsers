@@ -1,4 +1,4 @@
-module StringParser.Examples where
+module Test.Examples where
 
 import Prelude hiding (between)
 

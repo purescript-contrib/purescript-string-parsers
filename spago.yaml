@@ -1,0 +1,30 @@
+package:
+  name: string-parsers
+  publish:
+    license: MIT
+    version: 9.0.0
+    location:
+      githubOwner: purescript-contrib
+      githubRepo: purescript-string-parsers
+  dependencies:
+    - arrays: ">=7.3.0 <8.0.0"
+    - control: ">=6.0.0 <7.0.0"
+    - either: ">=6.1.0 <7.0.0"
+    - enums: ">=6.0.1 <7.0.0"
+    - foldable-traversable: ">=6.0.0 <7.0.0"
+    - lists: ">=7.0.0 <8.0.0"
+    - maybe: ">=6.0.0 <7.0.0"
+    - nonempty: ">=7.0.0 <8.0.0"
+    - prelude: ">=6.0.1 <7.0.0"
+    - strings: ">=6.0.1 <7.0.0"
+    - tailrec: ">=6.1.0 <7.0.0"
+  test:
+    main: Test.Main
+    dependencies:
+      - assert
+      - console
+      - effect
+      - partial
+      - transformers
+      - unfoldable
+workspace: {}
