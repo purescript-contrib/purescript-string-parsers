@@ -9,9 +9,17 @@ Breaking changes:
 New features:
 
 Bugfixes:
+
+Other improvements:
+
+## [v8.0.1](https://github.com/purescript-contrib/purescript-string-parsers/releases/tag/v8.0.1) - 2026-10-11
+
+Bugfixes:
 - fix spago package sets' upstream url
 
 Other improvements:
+- Migrate to registry-backed Spago 1.0, preserving published dependency ranges (#99).
+- Update repository tooling and CI actions, and retain benchmark compilation with Spago 1.0 (#99).
 
 ## [v8.0.0](https://github.com/purescript-contrib/purescript-string-parsers/releases/tag/v8.0.0) - 2022-04-27
 
