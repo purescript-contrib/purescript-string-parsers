@@ -51,5 +51,5 @@ You can contribute to `string-parsers` in several ways:
 To execute the benchmarks run the following command
 
 ```
-spago run --main Bench.Main
+spago build --purs-args 'bench/**/*.purs' && node --input-type=module -e 'import { main } from "./output/Bench.Main/index.js"; main();'
 ```
